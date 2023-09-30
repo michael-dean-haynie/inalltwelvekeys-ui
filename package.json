@@ -5,10 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:dev": "ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "sudo ng build && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui",
-    "deploy:dev": "sudo ng build --configuration=development && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui"
+    "deploy": "sudo rm -rf ./dist && sudo npm run build && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui",
+    "deploy:dev": "sudo rm -rf ./dist sudo npm run build:dev && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui"
   },
   "private": true,
   "dependencies": {
