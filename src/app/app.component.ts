@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { environment } from "../environments/environment";
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'inalltwelvekeys-ui';
+  title = `inalltwelvekeys-ui (${(environment as any).name})`;
+  // title = `inalltwelvekeys-ui (changed again)`;
 }
