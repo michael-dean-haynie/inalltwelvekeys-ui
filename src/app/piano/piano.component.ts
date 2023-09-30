@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import { Instrument } from "piano-chart";
 import { environment } from "../../environments/environment";
+import { MidiMessage} from "../models/midi-message.model";
 
 @Component({
   selector: 'app-piano',
@@ -19,8 +20,14 @@ export class PianoComponent implements OnInit {
   private initializePiano(): void {
     const pianoContainer = document.getElementById('pianoContainer');
     if (pianoContainer) {
-      this.piano = new Instrument(pianoContainer);
+      this.piano = new Instrument(pianoContainer, {
+        startOctave: 0,
+        startNote: "A",
+        endOctave: 8,
+        endNote: "C"
+      });
       this.piano.create();
+      console.log(this.piano);
 
       // this.piano.keyDown("D4");
       // this.piano.keyDown("F#4");
@@ -38,7 +45,11 @@ export class PianoComponent implements OnInit {
 
       // Function to handle incoming messages
       this.webSocket.onmessage = function(event) {
-        console.log(event)
+        // console.log(event)
+        if (event.data) {
+          const midiMessage: MidiMessage = JSON.parse(event.data);
+          console.log(midiMessage)
+        }
       };
 
       // Function to handle WebSocket connection opened
