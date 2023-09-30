@@ -1,3 +1,4 @@
 export const environment = {
-  name: 'development'
+  name: 'development',
+  websocketUrl: 'wss://mbp.local:8080'
 };

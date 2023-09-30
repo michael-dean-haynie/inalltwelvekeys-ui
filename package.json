@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "sudo ng build && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui"
+    "deploy": "sudo ng build && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui",
+    "deploy:dev": "sudo ng build --configuration=development && sudo rm -rf ../inalltwelvekeys/inalltwelvekeys-ui && sudo cp -r ./dist/inalltwelvekeys-ui ../inalltwelvekeys/inalltwelvekeys-ui"
   },
   "private": true,
   "dependencies": {
