@@ -100,16 +100,20 @@ export class VexFlowAdapter {
 
   private get trebleLine(): string {
     const noteNames = this.trebleKeys
-      .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave)
-      .join(' ');
-    return `(${noteNames})/w`;
+      .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave);
+    if (noteNames.length === 1) {
+      return `${noteNames.join(' ')}/w`
+    }
+    return `(${noteNames.join('')})/w`;
   }
 
   private get bassLine(): string {
     const noteNames = this.bassKeys
-      .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave)
-      .join(' ');
-    return `(${noteNames})/w`;
+      .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave);
+    if (noteNames.length === 1) {
+      return `${noteNames.join(' ')}/w`
+    }
+    return `(${noteNames.join('')})/w`;
   }
 
   private getNoteNameForPitchClass(pitchClass: PitchClass) {
