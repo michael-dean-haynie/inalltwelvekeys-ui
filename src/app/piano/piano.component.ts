@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import { Instrument } from "piano-chart";
 import { environment } from "../../environments/environment";
-import { MidiMessage} from "../models/midi-message.model";
+import { MidiMessage} from "../models/api/midi-message";
+import {PianoChartAdapter} from "../models/piano-chart/piano-chart-adapter";
+import {MidiNote} from "../models/midi-note";
 
 @Component({
   selector: 'app-piano',
@@ -9,7 +11,7 @@ import { MidiMessage} from "../models/midi-message.model";
   styleUrls: ['./piano.component.scss']
 })
 export class PianoComponent implements OnInit {
-  private piano: Instrument | undefined;
+  private pianoChartAdapter: PianoChartAdapter
   private webSocket: WebSocket | undefined
 
   ngOnInit(): void {
@@ -20,19 +22,15 @@ export class PianoComponent implements OnInit {
   private initializePiano(): void {
     const pianoContainer = document.getElementById('pianoContainer');
     if (pianoContainer) {
-      this.piano = new Instrument(pianoContainer, {
+      const instrument = new Instrument(pianoContainer, {
         startOctave: 0,
         startNote: "A",
         endOctave: 8,
-        endNote: "C"
+        endNote: "C",
+        showNoteNames: "never"
       });
-      this.piano.create();
-      console.log(this.piano);
-
-      // this.piano.keyDown("D4");
-      // this.piano.keyDown("F#4");
-      // this.piano.keyDown("A4");
-
+      this.pianoChartAdapter = new PianoChartAdapter(instrument);
+      console.log(instrument);
     }
     else {
       throw new Error('could not find piano container element')
@@ -44,21 +42,27 @@ export class PianoComponent implements OnInit {
       this.webSocket = new WebSocket((environment as any).websocketUrl);
 
       // Function to handle incoming messages
-      this.webSocket.onmessage = function(event) {
-        // console.log(event)
+      this.webSocket.onmessage = (event) => {
         if (event.data) {
           const midiMessage: MidiMessage = JSON.parse(event.data);
           console.log(midiMessage)
+
+          if (midiMessage.type === 'note_on') {
+            this.pianoChartAdapter.keyDown(new MidiNote(midiMessage.note))
+          }
+          if (midiMessage.type === 'note_off') {
+            this.pianoChartAdapter.keyUp(new MidiNote(midiMessage.note))
+          }
         }
       };
 
       // Function to handle WebSocket connection opened
-      this.webSocket.onopen = function(event) {
+      this.webSocket.onopen = (event) => {
         console.log('Connected to WebSocket server');
       };
 
       // Function to handle WebSocket errors
-      this.webSocket.onerror = function(error) {
+      this.webSocket.onerror = (error) => {
         console.error(`WebSocket error: ${error}`);
       };
 
