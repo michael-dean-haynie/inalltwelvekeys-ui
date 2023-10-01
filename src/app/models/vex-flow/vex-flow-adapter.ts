@@ -61,7 +61,7 @@ export class VexFlowAdapter {
     console.log('trebleKeys', this.trebleKeys);
     console.log('trebleLine', this.trebleLine);
     if (this.trebleKeys.length) {
-      trebleVoices.push(score.voice(score.notes(this.bassLine)));
+      trebleVoices.push(score.voice(score.notes(this.trebleLine)));
     }
     system.addStave({
       voices: trebleVoices
