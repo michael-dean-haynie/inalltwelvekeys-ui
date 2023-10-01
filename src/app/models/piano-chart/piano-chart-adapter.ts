@@ -30,6 +30,8 @@ export class PianoChartAdapter {
       { note: "B", octave: pianoKey.octave },
     ];
 
-    return pianoKeyMap[pianoKey.pitchClass.integerNotation];
+    const noteValue = pianoKeyMap[pianoKey.pitchClass.integerNotation];
+    console.log(noteValue);
+    return noteValue;
   }
 }
