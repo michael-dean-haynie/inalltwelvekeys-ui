@@ -9,6 +9,6 @@ export class PianoKey {
   constructor(midiNote: MidiNote) {
     this.number = midiNote.number - 20;
     this.octave = Math.floor(this.number + 8);
-    this.pitchClass = new PitchClass(midiNote.number);
+    this.pitchClass = new PitchClass(midiNote);
   }
 }

@@ -3,7 +3,7 @@ import {PianoKey} from "../piano-key";
 import {MidiNote} from "../midi-note";
 
 export class PianoChartAdapter {
-  private constructor(private instrument: Instrument) {}
+  constructor(private instrument: Instrument) {}
 
   public keyDown(midiNote: MidiNote) {
     this.instrument.keyDown(this.convertMidiNoteToNoteValue(midiNote))

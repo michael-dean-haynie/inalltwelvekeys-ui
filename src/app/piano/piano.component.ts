@@ -11,12 +11,26 @@ import {MidiNote} from "../models/midi-note";
   styleUrls: ['./piano.component.scss']
 })
 export class PianoComponent implements OnInit {
-  private pianoChartAdapter: PianoChartAdapter
-  private webSocket: WebSocket | undefined
+  private _pianoChartAdapter: PianoChartAdapter | undefined;
+  private _webSocket: WebSocket | undefined;
 
   ngOnInit(): void {
     this.initializePiano();
     this.initializeWebSocket();
+  }
+
+  get pianoChartAdapter() : PianoChartAdapter {
+    if (!this._pianoChartAdapter) {
+      throw new Error();
+    }
+    return this._pianoChartAdapter;
+  }
+
+  get webSocket() : WebSocket {
+    if (!this._webSocket) {
+      throw new Error();
+    }
+    return this._webSocket;
   }
 
   private initializePiano(): void {
@@ -29,7 +43,7 @@ export class PianoComponent implements OnInit {
         endNote: "C",
         showNoteNames: "never"
       });
-      this.pianoChartAdapter = new PianoChartAdapter(instrument);
+      this._pianoChartAdapter = new PianoChartAdapter(instrument);
       console.log(instrument);
     }
     else {
@@ -39,7 +53,7 @@ export class PianoComponent implements OnInit {
 
   private initializeWebSocket(): void {
     try {
-      this.webSocket = new WebSocket((environment as any).websocketUrl);
+      this._webSocket = new WebSocket((environment as any).websocketUrl);
 
       // Function to handle incoming messages
       this.webSocket.onmessage = (event) => {
