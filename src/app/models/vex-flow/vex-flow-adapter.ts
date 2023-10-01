@@ -1,4 +1,4 @@
-import {Factory, FactoryOptions, StaveConnector, Vex} from "vexflow";
+import {Factory, FactoryOptions, StaveConnector, Vex, Voice} from "vexflow";
 import {MidiMessage} from "../api/midi-message";
 import {MidiNote} from "../midi-note";
 import {PianoKey} from "../piano-key";
@@ -57,16 +57,20 @@ export class VexFlowAdapter {
       width: 100,
     });
 
+    let trebleVoices: Voice[] = []
+    if (this.trebleKeys.length) {
+      trebleVoices.push(score.voice(score.notes(this.baseLine)));
+    }
     system.addStave({
-      voices: [
-        score.voice(score.notes(this.trebleLine))
-      ]
+      voices: trebleVoices
     }).addClef('treble');
 
+    const bassVoices: Voice[] = []
+    if (this.trebleKeys.length) {
+      bassVoices.push(score.voice(score.notes(this.baseLine, {clef: 'bass'})))
+    }
     system.addStave({
-      voices: [
-        score.voice(score.notes(this.baseLine, {clef: 'bass'})),
-      ]
+      voices: bassVoices
     }).addClef('bass');
 
     system.addConnector();
@@ -75,19 +79,28 @@ export class VexFlowAdapter {
     vf.draw();
   }
 
-  private get trebleLine(): string {
-    const noteNames =  this.notes
+
+  private get trebleKeys(): PianoKey[] {
+    return this.notes
       .map(midiNote => new PianoKey(midiNote))
-      .filter(pianoKey => pianoKey.octave >= 4 && pianoKey.pitchClass.integerNotation >= 0)
+      .filter(pianoKey => pianoKey.octave >= 4 && pianoKey.pitchClass.integerNotation >= 0);
+  }
+
+  private get bassKeys(): PianoKey[] {
+    return this.notes
+      .map(midiNote => new PianoKey(midiNote))
+      .filter(pianoKey => pianoKey.octave < 4);
+  }
+
+  private get trebleLine(): string {
+    const noteNames = this.trebleKeys
       .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave)
       .join(' ');
     return `(${noteNames})/w`;
   }
 
   private get baseLine(): string {
-    const noteNames =  this.notes
-      .map(midiNote => new PianoKey(midiNote))
-      .filter(pianoKey => pianoKey.octave < 4)
+    const noteNames = this.bassKeys
       .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave)
       .join(' ');
     return `(${noteNames})/w`;
