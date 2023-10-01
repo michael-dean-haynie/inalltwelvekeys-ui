@@ -43,8 +43,9 @@ export class PianoComponent implements OnInit {
         endNote: "C",
         showNoteNames: "never"
       });
-      this._pianoChartAdapter = new PianoChartAdapter(instrument);
+      instrument.create();
       console.log(instrument);
+      this._pianoChartAdapter = new PianoChartAdapter(instrument);
     }
     else {
       throw new Error('could not find piano container element')
