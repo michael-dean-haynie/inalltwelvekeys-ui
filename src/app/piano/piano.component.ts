@@ -41,7 +41,8 @@ export class PianoComponent implements OnInit {
         startNote: "A",
         endOctave: 8,
         endNote: "C",
-        showNoteNames: "never"
+        showNoteNames: "never",
+        keyPressStyle: "vivid"
       });
       instrument.create();
       console.log(instrument);
