@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { environment } from "../environments/environment";
+import {WebsocketService} from "./websocket.service";
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,18 @@ import { environment } from "../environments/environment";
 })
 export class AppComponent {
   title = `inalltwelvekeys-ui (${(environment as any).name})`;
-  // title = `inalltwelvekeys-ui (changed again)`;
+
+  constructor(private websocketService: WebsocketService) {
+    websocketService.websocketSubject.subscribe({
+      next(msgEvent) {
+        console.log("Subscription A: ", msgEvent);
+      }
+    });
+    websocketService.websocketSubject.subscribe({
+      next(msgEvent) {
+        console.log("Subscription B: ", msgEvent);
+      }
+    });
+  }
+
 }
