@@ -3,7 +3,16 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": [],
+//    "baseUrl": "./",
+//    "paths": {
+//      // Choose one of the options below to customize the font that will be statically compiled into your entry bundle.
+//      "vexflow/bravura": [
+//        "node_modules/vexflow/entry/vexflow-bravura.ts"// 486 KiB
+//      ]
+////      "vexflow/gonville": ["node_modules/vexflow/entry/vexflow-gonville.ts"], // 439 KiB
+////      "vexflow/petaluma": ["node_modules/vexflow/entry/vexflow-petaluma.ts"]  // 460 KiB
+//    }
   },
   "files": [
     "src/main.ts"
