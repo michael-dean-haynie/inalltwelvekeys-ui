@@ -31,8 +31,6 @@ export class PianoChartAdapter {
     ];
 
     const noteValue = pianoKeyMap[pianoKey.pitchClass.integerNotation];
-    console.log("midiNote.number", midiNote.number);
-    console.log(noteValue);
     return noteValue;
   }
 }

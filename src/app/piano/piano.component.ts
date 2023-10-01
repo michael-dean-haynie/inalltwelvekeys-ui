@@ -47,7 +47,6 @@ export class PianoComponent implements OnInit, OnDestroy {
         keyPressStyle: "vivid"
       });
       instrument.create();
-      console.log(instrument);
       this._pianoChartAdapter = new PianoChartAdapter(instrument);
     }
     else {
@@ -59,7 +58,6 @@ export class PianoComponent implements OnInit, OnDestroy {
     this._websocketSubscription = this.websocketService.websocketSubject.subscribe((messageEvent) => {
       if (messageEvent.data) {
         const midiMessage: MidiMessage = JSON.parse(messageEvent.data);
-        console.log(midiMessage)
 
         if (midiMessage.type === 'note_on') {
           this.pianoChartAdapter.keyDown(new MidiNote(midiMessage.note))

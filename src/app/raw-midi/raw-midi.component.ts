@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {environment} from "../../environments/environment";
+import {Subscription} from "rxjs";
+import {WebsocketService} from "../websocket.service";
+import {MidiMessage} from "../models/api/midi-message";
 
 @Component({
   selector: 'app-raw-midi',
@@ -7,36 +9,23 @@ import {environment} from "../../environments/environment";
   styleUrls: ['./raw-midi.component.scss']
 })
 export class RawMidiComponent implements OnInit {
+  private _websocketSubscription: Subscription | undefined;
+  websocketMessages: string[] = []
+
+  constructor(private websocketService: WebsocketService) {}
+
   ngOnInit(): void {
-    const socket = new WebSocket((environment as any).websocketUrl);
-
-    // Function to handle incoming messages
-    socket.onmessage = function(event) {
-      // const output = document.getElementById('output');
-      // output.innerHTML = `<p>Received: ${event.data}</p>` + output.innerHTML;
-      console.log(event)
-    };
-
-    // Function to handle WebSocket connection opened
-    socket.onopen = function(event) {
-      console.log('Connected to WebSocket server');
-    };
-
-    // Function to handle WebSocket errors
-    socket.onerror = function(error) {
-      console.error(`WebSocket error: ${error}`);
-    };
-
-    // Function to handle WebSocket connection closure
-    socket.onclose = function(event) {
-      if (event.wasClean) {
-        console.log(`WebSocket connection closed cleanly, code: ${event.code}, reason: ${event.reason}`);
-      } else {
-        console.error('WebSocket connection abruptly closed');
+    this._websocketSubscription = this.websocketService.websocketSubject.subscribe((messageEvent) => {
+      if (messageEvent.data) {
+       this.websocketMessages.unshift(messageEvent.data);
       }
-    };
+    });
+  }
 
-    console.log(socket)
+  ngOnDestroy(): void {
+    if (this._websocketSubscription){
+      this._websocketSubscription.unsubscribe();
+    }
   }
 
 }

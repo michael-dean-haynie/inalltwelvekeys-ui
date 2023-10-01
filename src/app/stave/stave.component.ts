@@ -41,7 +41,6 @@ export class StaveComponent implements OnInit{
     this._websocketSubscription = this.websocketService.websocketSubject.subscribe((messageEvent) => {
       if (messageEvent.data) {
         const midiMessage: MidiMessage = JSON.parse(messageEvent.data);
-        console.log(midiMessage)
 
         if (['note_on', 'note_off'].includes(midiMessage.type)) {
           this.vexFlowAdapter.update(midiMessage)
