@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'raw', component: RawMidiComponent },
   { path: 'piano', component: PianoComponent },
   { path: 'stave', component: StaveComponent },
+  { path: 'staff', redirectTo: 'stave', pathMatch: 'full' },
   { path: '', redirectTo: 'piano', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent },
 ];
