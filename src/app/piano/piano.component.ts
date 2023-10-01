@@ -16,7 +16,13 @@ export class PianoComponent implements OnInit, OnDestroy {
   private _pianoChartAdapter: PianoChartAdapter | undefined;
   private _websocketSubscription: Subscription | undefined;
 
-  constructor(private websocketService: WebsocketService) {}
+  constructor(private websocketService: WebsocketService) {
+    websocketService.websocketSubject.subscribe({
+      next(msgEvent) {
+        console.log("Subscription C: ", msgEvent);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.initializePiano();
