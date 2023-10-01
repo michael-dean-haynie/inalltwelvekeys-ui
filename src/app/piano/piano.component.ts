@@ -1,22 +1,32 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Instrument } from "piano-chart";
 import { environment } from "../../environments/environment";
 import { MidiMessage} from "../models/api/midi-message";
 import {PianoChartAdapter} from "../models/piano-chart/piano-chart-adapter";
 import {MidiNote} from "../models/midi-note";
+import {WebsocketService} from "../websocket.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-piano',
   templateUrl: './piano.component.html',
   styleUrls: ['./piano.component.scss']
 })
-export class PianoComponent implements OnInit {
+export class PianoComponent implements OnInit, OnDestroy {
   private _pianoChartAdapter: PianoChartAdapter | undefined;
-  private _webSocket: WebSocket | undefined;
+  private _websocketSubscription: Subscription | undefined;
+
+  constructor(private websocketService: WebsocketService) {}
 
   ngOnInit(): void {
     this.initializePiano();
     this.initializeWebSocket();
+  }
+
+  ngOnDestroy(): void {
+    if (this._websocketSubscription){
+      this._websocketSubscription.unsubscribe();
+    }
   }
 
   get pianoChartAdapter() : PianoChartAdapter {
@@ -24,13 +34,6 @@ export class PianoComponent implements OnInit {
       throw new Error();
     }
     return this._pianoChartAdapter;
-  }
-
-  get webSocket() : WebSocket {
-    if (!this._webSocket) {
-      throw new Error();
-    }
-    return this._webSocket;
   }
 
   private initializePiano(): void {
@@ -54,47 +57,19 @@ export class PianoComponent implements OnInit {
   }
 
   private initializeWebSocket(): void {
-    try {
-      this._webSocket = new WebSocket((environment as any).websocketUrl);
+    this._websocketSubscription = this.websocketService.websocketSubject.subscribe((messageEvent) => {
+      if (messageEvent.data) {
+        const midiMessage: MidiMessage = JSON.parse(messageEvent.data);
+        console.log(midiMessage)
 
-      // Function to handle incoming messages
-      this.webSocket.onmessage = (event) => {
-        if (event.data) {
-          const midiMessage: MidiMessage = JSON.parse(event.data);
-          console.log(midiMessage)
-
-          if (midiMessage.type === 'note_on') {
-            this.pianoChartAdapter.keyDown(new MidiNote(midiMessage.note))
-          }
-          if (midiMessage.type === 'note_off') {
-            this.pianoChartAdapter.keyUp(new MidiNote(midiMessage.note))
-          }
+        if (midiMessage.type === 'note_on') {
+          this.pianoChartAdapter.keyDown(new MidiNote(midiMessage.note))
         }
-      };
-
-      // Function to handle WebSocket connection opened
-      this.webSocket.onopen = (event) => {
-        console.log('Connected to WebSocket server');
-      };
-
-      // Function to handle WebSocket errors
-      this.webSocket.onerror = (error) => {
-        console.error(`WebSocket error: ${error}`);
-      };
-
-      // Function to handle WebSocket connection closure
-      this.webSocket.onclose = function(event) {
-        if (event.wasClean) {
-          console.log(`WebSocket connection closed cleanly, code: ${event.code}, reason: ${event.reason}`);
-        } else {
-          console.error('WebSocket connection abruptly closed');
+        if (midiMessage.type === 'note_off') {
+          this.pianoChartAdapter.keyUp(new MidiNote(midiMessage.note))
         }
-      };
-
-    }
-    catch (e) {
-      throw e;
-    }
+      }
+    });
   }
 
 
