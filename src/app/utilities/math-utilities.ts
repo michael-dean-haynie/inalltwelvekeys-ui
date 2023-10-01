@@ -5,5 +5,5 @@
  * @param modulus the number by which the dividend is divided
  */
 export function posModRes(dividend: number, modulus: number): number {
-  return ((dividend % modulus) + modulus) & modulus;
+  return ((dividend % modulus) + modulus) % modulus;
 }
