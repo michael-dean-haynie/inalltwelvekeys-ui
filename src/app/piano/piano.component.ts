@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Instrument } from "piano-chart";
-import { environment } from "../../environments/environment";
 import { MidiMessage} from "../models/api/midi-message";
 import {PianoChartAdapter} from "../models/piano-chart/piano-chart-adapter";
 import {MidiNote} from "../models/midi-note";
@@ -16,13 +15,7 @@ export class PianoComponent implements OnInit, OnDestroy {
   private _pianoChartAdapter: PianoChartAdapter | undefined;
   private _websocketSubscription: Subscription | undefined;
 
-  constructor(private websocketService: WebsocketService) {
-    websocketService.websocketSubject.subscribe({
-      next(msgEvent) {
-        console.log("Subscription C: ", msgEvent);
-      }
-    });
-  }
+  constructor(private websocketService: WebsocketService) {}
 
   ngOnInit(): void {
     this.initializePiano();

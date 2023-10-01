@@ -10,17 +10,7 @@ import {WebsocketService} from "./websocket.service";
 export class AppComponent {
   title = `inalltwelvekeys-ui (${(environment as any).name})`;
 
-  constructor(private websocketService: WebsocketService) {
-    websocketService.websocketSubject.subscribe({
-      next(msgEvent) {
-        console.log("Subscription A: ", msgEvent);
-      }
-    });
-    websocketService.websocketSubject.subscribe({
-      next(msgEvent) {
-        console.log("Subscription B: ", msgEvent);
-      }
-    });
-  }
+  // force websocket to initialize
+  constructor(private websocketService: WebsocketService) {}
 
 }
