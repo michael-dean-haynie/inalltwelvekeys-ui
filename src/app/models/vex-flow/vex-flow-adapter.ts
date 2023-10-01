@@ -68,9 +68,9 @@ export class VexFlowAdapter {
     }).addClef('treble');
 
     const bassVoices: Voice[] = []
-    console.log('bassKeys', this.trebleKeys);
+    console.log('bassKeys', this.bassKeys);
     console.log('bassLine', this.bassLine);
-    if (this.trebleKeys.length) {
+    if (this.bassKeys.length) {
       bassVoices.push(score.voice(score.notes(this.bassLine, {clef: 'bass'})))
     }
     system.addStave({
