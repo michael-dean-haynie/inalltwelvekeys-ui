@@ -10,7 +10,10 @@ export class WebsocketService {
   private readonly _websocketSubject: Subject<MessageEvent>;
 
   constructor() {
-    this._websocketSubject = webSocket((environment as any).websocketUrl);
+    this._websocketSubject = webSocket<MessageEvent>({
+      url: (environment as any).websocketUrl,
+      deserializer: (messageEvent) => messageEvent
+    });
   }
 
   get websocketSubject(): Subject<MessageEvent> {
