@@ -58,16 +58,20 @@ export class VexFlowAdapter {
     });
 
     let trebleVoices: Voice[] = []
+    console.log('trebleKeys', this.trebleKeys);
+    console.log('trebleLine', this.trebleLine);
     if (this.trebleKeys.length) {
-      trebleVoices.push(score.voice(score.notes(this.baseLine)));
+      trebleVoices.push(score.voice(score.notes(this.bassLine)));
     }
     system.addStave({
       voices: trebleVoices
     }).addClef('treble');
 
     const bassVoices: Voice[] = []
+    console.log('bassKeys', this.trebleKeys);
+    console.log('bassLine', this.bassLine);
     if (this.trebleKeys.length) {
-      bassVoices.push(score.voice(score.notes(this.baseLine, {clef: 'bass'})))
+      bassVoices.push(score.voice(score.notes(this.bassLine, {clef: 'bass'})))
     }
     system.addStave({
       voices: bassVoices
@@ -99,7 +103,7 @@ export class VexFlowAdapter {
     return `(${noteNames})/w`;
   }
 
-  private get baseLine(): string {
+  private get bassLine(): string {
     const noteNames = this.bassKeys
       .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave)
       .join(' ');
