@@ -93,7 +93,8 @@ export class ExerciseEditComponent implements OnInit{
 
   private generateNewExercise(): Exercise {
     return {
-      id: uuidv4(),
+      id: 'f1c2a3b1-5792-4527-b062-66fcca100881',
+      // id: uuidv4(),
       name: 'New Exercise Name',
       description: 'New Exercise Description',
       iterations: Object.values(NoteLetters).flatMap(letter => {

@@ -45,11 +45,13 @@ export class ExerciseComponent implements OnInit{
     });
 
     this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
+      console.log(pianoKeys)
       const iteration = this.exercise.iterations[this.iterationIndex];
       const spelledPitchClass = new SpelledPitchClass(
         iteration.noteLetter,
         iteration.accidental);
       const targetPitchClass = PitchClass.fromSpelledPitchClass(spelledPitchClass);
+      console.log(targetPitchClass.integerNotation);
 
       const iterationNoteWasPlayed = pianoKeys.some(pk => {
         return pk.pitchClass.integerNotation === targetPitchClass.integerNotation;
@@ -81,6 +83,7 @@ export class ExerciseComponent implements OnInit{
 
   shuffle(): void {
     this.exercise.iterations.sort(shuffleAlgo);
+    this.exercise.iterations = this.exercise.iterations.filter(itr => itr.enabled);
     console.log(this.exercise.iterations
         .map(itr => `${itr.noteLetter}${itr.accidental}`)
         .join(' '));
