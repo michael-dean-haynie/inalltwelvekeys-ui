@@ -4,6 +4,9 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {Exercise} from "../models/api/exercise";
 import {shuffleAlgo} from "../utilities/math-utilities";
 import {WebsocketService} from "../websocket.service";
+import {PitchClass} from "../models/pitch-class";
+import {SpelledPitchClass} from "../models/spelled-pitch-class";
+import {Accidentals} from "../models/notation";
 
 @Component({
   selector: 'app-exercise',
@@ -12,6 +15,8 @@ import {WebsocketService} from "../websocket.service";
 })
 export class ExerciseComponent implements OnInit{
   private _exercise: Exercise | undefined;
+  private iterationIndex: number = 0;
+  complete: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,6 +32,7 @@ export class ExerciseComponent implements OnInit{
         this.exerciseService.get(id).subscribe(exercise => {
           if (exercise) {
             this._exercise = exercise;
+            this.shuffle();
           }
           else {
             this.router.navigate(['/404'], { skipLocationChange: true});
@@ -38,7 +44,26 @@ export class ExerciseComponent implements OnInit{
       }
     });
 
-    this.websocketService.pianoKeysChangesSubject.subscribe(val => console.log(val))
+    this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
+      const iteration = this.exercise.iterations[this.iterationIndex];
+      const spelledPitchClass = new SpelledPitchClass(
+        iteration.noteLetter,
+        iteration.accidental);
+      const targetPitchClass = PitchClass.fromSpelledPitchClass(spelledPitchClass);
+
+      const iterationNoteWasPlayed = pianoKeys.some(pk => {
+        return pk.pitchClass.integerNotation === targetPitchClass.integerNotation;
+      });
+
+      if (iterationNoteWasPlayed) {
+        if (this.iterationIndex + 1 === this.exercise.iterations.length) {
+          this.complete = true;
+        }
+        else {
+          this.iterationIndex++;
+        }
+      }
+    });
   }
 
   get exercise(): Exercise {
@@ -46,6 +71,12 @@ export class ExerciseComponent implements OnInit{
       throw new Error();
     }
     return this._exercise;
+  }
+
+  get prettyIteration(): string {
+    const iteration = this.exercise.iterations[this.iterationIndex];
+    return `${iteration.noteLetter}${iteration.accidental}`
+      .replace(Accidentals.Natural, ' ');
   }
 
   shuffle(): void {

@@ -1,2 +1,8 @@
 <p>exercise works!</p>
-<button (click)="shuffle()">Shuffle</button>
+<!--<button (click)="shuffle()">Shuffle</button>-->
+<div *ngIf="complete">
+  YAY YOU COMPLETED THE EXERCISE!
+</div>
+<div *ngIf="!complete">
+  <div class="prompt">{{prettyIteration}}</div>
+</div>
