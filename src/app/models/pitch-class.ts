@@ -18,7 +18,7 @@ export class PitchClass {
     const pitchClass = new PitchClass();
     let integerNotation = PitchClass.noteLetterToIntegerPitchClassMap[spelledPitchClass.noteLetter];
     integerNotation += PitchClass.accidentalOffset[spelledPitchClass.accidental];
-    pitchClass.integerNotation = integerNotation;
+    pitchClass.integerNotation = posModRes(integerNotation, 12)
     return pitchClass
   }
 

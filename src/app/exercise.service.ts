@@ -49,7 +49,8 @@ export class ExerciseService {
 
   private seed(): void {
     this.exercises.push({
-      id: uuidv4(),
+      // id: uuidv4(),
+      id: 'fd7259d3-ec4e-4da6-9bc0-47cab51b3fad',
       name: 'Exercise 1',
       description: '',
       iterations: Object.values(NoteLetters).flatMap(letter => {
