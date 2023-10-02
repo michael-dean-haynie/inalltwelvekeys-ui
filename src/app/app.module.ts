@@ -7,6 +7,11 @@ import { RawMidiComponent } from './raw-midi/raw-midi.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { PianoComponent } from './piano/piano.component';
 import { StaveComponent } from './stave/stave.component';
+import { ExerciseComponent } from './exercise/exercise.component';
+import { ExercisesComponent } from './exercises/exercises.component';
+import { ExerciseEditComponent } from './exercise-edit/exercise-edit.component';
+import {ReactiveFormsModule} from "@angular/forms";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -14,11 +19,16 @@ import { StaveComponent } from './stave/stave.component';
     RawMidiComponent,
     NotFoundComponent,
     PianoComponent,
-    StaveComponent
+    StaveComponent,
+    ExerciseComponent,
+    ExercisesComponent,
+    ExerciseEditComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,0 +1,18 @@
+<p>exercise-edit works!</p>
+
+<form *ngIf="modeIsCreate || modeIsUpdate" [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
+  <input formControlName="name" placeholder="Exercise Name">
+  <input formControlName="description" placeholder="Exercise Description">
+  <div formArrayName="iterations">
+    <div *ngFor="let iteration of iterations.controls; index as i">
+      <div formGroupName="{{i}}">
+<!--        <input formControlName="noteLetter" placeholder="B">-->
+<!--        <input formControlName="accidental" placeholder="♭">-->
+        <span>{{iteration.get('noteLetter')?.value}}</span>
+        <span>{{iteration.get('accidental')?.value}}</span>
+        <input type="checkbox" formControlName="enabled">
+      </div>
+    </div>
+  </div>
+  <button>{{modeIsCreate ? "Create" : "Update" }}</button>
+</form>

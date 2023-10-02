@@ -1,0 +1,10 @@
+<p>exercises works!</p>
+<div *ngFor="let exercise of exercises; index as i">
+  <a routerLink="/exercise/{{exercise.id}}">
+    <button>Start</button>
+  </a>
+  <a routerLink="/exercise/edit/{{exercise.id}}">
+    <button>Edit</button>
+  </a>
+  <span>{{exercise.name}}</span>
+</div>

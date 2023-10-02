@@ -7,3 +7,7 @@
 export function posModRes(dividend: number, modulus: number): number {
   return ((dividend % modulus) + modulus) % modulus;
 }
+
+export function shuffleAlgo() {
+  return Math.random() - 0.5;
+}
