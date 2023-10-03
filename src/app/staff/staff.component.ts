@@ -5,11 +5,11 @@ import {WebsocketService} from "../websocket.service";
 import {Subscription} from "rxjs";
 
 @Component({
-  selector: 'app-stave',
-  templateUrl: './stave.component.html',
-  styleUrls: ['./stave.component.scss']
+  selector: 'app-staff',
+  templateUrl: './staff.component.html',
+  styleUrls: ['./staff.component.scss']
 })
-export class StaveComponent implements OnInit{
+export class StaffComponent implements OnInit{
   private _vexFlowAdapter: VexFlowAdapter | undefined;
   private _websocketSubscription: Subscription | undefined;
 

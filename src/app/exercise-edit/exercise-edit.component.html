@@ -1,5 +1,3 @@
-<p>exercise-edit works!</p>
-
 <form *ngIf="modeIsCreate || modeIsUpdate" [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
   <input formControlName="name" placeholder="Exercise Name">
   <input formControlName="description" placeholder="Exercise Description">

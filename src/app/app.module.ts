@@ -6,12 +6,13 @@ import { AppComponent } from './app.component';
 import { RawMidiComponent } from './raw-midi/raw-midi.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { PianoComponent } from './piano/piano.component';
-import { StaveComponent } from './stave/stave.component';
+import { StaffComponent } from './staff/staff.component';
 import { ExerciseComponent } from './exercise/exercise.component';
 import { ExercisesComponent } from './exercises/exercises.component';
 import { ExerciseEditComponent } from './exercise-edit/exercise-edit.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
+import { NavComponent } from './nav/nav.component';
 
 @NgModule({
   declarations: [
@@ -19,10 +20,11 @@ import {HttpClientModule} from "@angular/common/http";
     RawMidiComponent,
     NotFoundComponent,
     PianoComponent,
-    StaveComponent,
+    StaffComponent,
     ExerciseComponent,
     ExercisesComponent,
-    ExerciseEditComponent
+    ExerciseEditComponent,
+    NavComponent
   ],
   imports: [
     BrowserModule,
