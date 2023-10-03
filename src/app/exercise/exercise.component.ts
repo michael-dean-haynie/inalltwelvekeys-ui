@@ -46,6 +46,7 @@ export class ExerciseComponent implements OnInit{
     });
 
     this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
+      console.log('exercise: :', this.exercise);
       const iteration = this.exercise.iterations[this.iterationIndex];
       const iterationPitchClass = PitchClass.fromSpelledPitchClass(new SpelledPitchClass(
         iteration.noteLetter,
