@@ -52,6 +52,7 @@ export class ExerciseComponent implements OnInit{
         iteration.accidental));
 
       const chord = this.exercise.sequence[this.chordIndex];
+      console.log('chord: ', chord);
       const chordPitchClasses = chord.map(member => {
         return new PitchClass(iterationPitchClass.integerNotation + member);
       });
