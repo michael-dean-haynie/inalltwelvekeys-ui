@@ -55,11 +55,13 @@ export class ExerciseComponent implements OnInit{
       const chordPitchClasses = chord.map(member => {
         return new PitchClass(iterationPitchClass.integerNotation + member);
       });
+      console.log('chordPitchClasses: ', chordPitchClasses);
 
       // sort piano keys by ascending midi value
       pianoKeys.sort((a, b) => {
         return a.midiNote.number - b.midiNote.number;
       });
+      console.log('pianoKeys: ', pianoKeys);
 
       let chordWasPlayed = true;
       if (pianoKeys.length === chordPitchClasses.length){
