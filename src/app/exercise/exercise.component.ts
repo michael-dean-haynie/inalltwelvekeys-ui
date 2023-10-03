@@ -65,8 +65,8 @@ export class ExerciseComponent implements OnInit{
 
       let chordWasPlayed = true;
       if (pianoKeys.length === chordPitchClasses.length){
-        for (let i = 0; i < pianoKeys.length; i++) {
-          if (new PitchClass(chord[i]).integerNotation !== pianoKeys[i].pitchClass.integerNotation) {
+        for (let i = 0; i < chordPitchClasses.length; i++) {
+          if (chordPitchClasses[i].integerNotation !== pianoKeys[i].pitchClass.integerNotation) {
             chordWasPlayed = false;
             break;
           }
