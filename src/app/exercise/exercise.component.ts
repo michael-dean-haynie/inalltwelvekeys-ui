@@ -72,6 +72,9 @@ export class ExerciseComponent implements OnInit{
           }
         }
       }
+      else {
+        chordWasPlayed = false;
+      }
 
       if (chordWasPlayed) {
         this.chordIndex++;
