@@ -57,8 +57,11 @@ export class ExerciseEditComponent implements OnInit{
           noteLetter: iteration.get('noteLetter')?.value,
           accidental: iteration.get('accidental')?.value,
           enabled: iteration.get('enabled')?.value,
-        }
+        };
       }),
+      sequence: this.sequence.controls.map(chord => {
+        return (chord as FormArray).controls.map(member => member.value);
+      })
     }
 
     if (this.modeIsCreate) {
@@ -77,6 +80,26 @@ export class ExerciseEditComponent implements OnInit{
     return this.exerciseForm.get('iterations') as FormArray;
   }
 
+  get sequence(): FormArray {
+    return this.exerciseForm.get('sequence') as FormArray;
+  }
+
+  getChord(index: number): FormArray {
+    return this.sequence.controls[index] as FormArray;
+  }
+
+  addChord(): void {
+    this.sequence.push(this.fb.array([0]));
+  }
+
+  deleteChord(index: number): void {
+    this.sequence.removeAt(index);
+  }
+
+  addMemberToChord(index: number): void {
+    this.getChord(index).push(this.fb.control(0))
+  }
+
   private loadFormWithExercise(exercise: Exercise): void {
     this.exerciseForm = this.fb.group({
       id: [exercise.id],
@@ -86,7 +109,8 @@ export class ExerciseEditComponent implements OnInit{
         noteLetter: [iteration.noteLetter],
         accidental: [iteration.accidental],
         enabled: [iteration.enabled]
-      })))
+      }))),
+      sequence: this.fb.array(exercise.sequence.map(chord => this.fb.array(chord)))
     });
     console.log(this.exerciseForm);
   }
@@ -104,7 +128,8 @@ export class ExerciseEditComponent implements OnInit{
             enabled: [Accidentals.Flat, Accidentals.Natural, Accidentals.Sharp].some(acc => acc === accidental)
           }
         })
-      })
+      }),
+      sequence: [[0]]
     }
   }
 }

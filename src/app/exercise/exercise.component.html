@@ -3,5 +3,12 @@
   YAY YOU COMPLETED THE EXERCISE!
 </div>
 <div *ngIf="!complete">
-  <div class="prompt">{{prettyIteration}}</div>
+  <div>Iteration (Key): {{prettyIteration}}</div>
+  <div *ngFor="let chord of exercise.sequence; index as i">
+    <div class="chord">
+      <span *ngFor="let member of chord; index as j" class="member">
+        {{member}}
+      </span>
+    </div>
+  </div>
 </div>

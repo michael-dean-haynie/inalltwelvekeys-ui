@@ -2,6 +2,7 @@
   <input formControlName="name" placeholder="Exercise Name">
   <input formControlName="description" placeholder="Exercise Description">
   <div formArrayName="iterations">
+    <div>Iterations (Keys)</div>
     <div *ngFor="let iteration of iterations.controls; index as i">
       <div formGroupName="{{i}}">
 <!--        <input formControlName="noteLetter" placeholder="B">-->
@@ -11,6 +12,19 @@
         <input type="checkbox" formControlName="enabled">
       </div>
     </div>
+  </div>
+  <div formArrayName="sequence">
+    <div>Sequence (Chords)</div>
+    <div *ngFor="let chord of sequence.controls; index as i">
+      <span formArrayName="{{i}}">
+        <span *ngFor="let member of getChord(i).controls; index as j">
+          <input formControlName="{{j}}" placeholder="0">
+        </span>
+        <button type="button" (click)="addMemberToChord(i)">Add Chord Member</button>
+      </span>
+      <button type="button" (click)="deleteChord(i)">Delete Chord</button>
+    </div>
+    <button type="button" (click)="addChord()">Add Chord</button>
   </div>
   <button>{{modeIsCreate ? "Create" : "Update" }}</button>
 </form>

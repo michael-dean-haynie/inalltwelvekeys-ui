@@ -4,22 +4,19 @@ import { Accidentals, NoteLetters} from "./notation";
 import {SpelledPitchClass} from "./spelled-pitch-class";
 
 export class PitchClass {
-  integerNotation: number = 0;
 
-  private constructor() {}
+  constructor(public integerNotation = 0) {
+    this.integerNotation = posModRes(integerNotation, 12);
+  }
 
   static fromMidiNote(midiNote: MidiNote): PitchClass {
-    const pitchClass = new PitchClass();
-    pitchClass.integerNotation = posModRes(midiNote.number - 24, 12);
-    return pitchClass
+    return new PitchClass(midiNote.number - 24);
   }
 
   static fromSpelledPitchClass(spelledPitchClass: SpelledPitchClass): PitchClass {
-    const pitchClass = new PitchClass();
     let integerNotation = PitchClass.noteLetterToIntegerPitchClassMap[spelledPitchClass.noteLetter];
     integerNotation += PitchClass.accidentalOffset[spelledPitchClass.accidental];
-    pitchClass.integerNotation = posModRes(integerNotation, 12)
-    return pitchClass
+    return new PitchClass(integerNotation);
   }
 
   private static noteLetterToIntegerPitchClassMap = {

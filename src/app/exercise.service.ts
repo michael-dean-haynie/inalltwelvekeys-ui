@@ -61,7 +61,8 @@ export class ExerciseService {
             enabled: [Accidentals.Flat, Accidentals.Natural, Accidentals.Sharp].some(acc => acc === accidental)
           }
         })
-      })
+      }),
+      sequence: [[0]]
     })
   }
 }

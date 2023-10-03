@@ -15,7 +15,8 @@ import {Accidentals} from "../models/notation";
 })
 export class ExerciseComponent implements OnInit{
   private _exercise: Exercise | undefined;
-  private iterationIndex: number = 0;
+  iterationIndex: number = 0;
+  chordIndex: number = 0
   complete: boolean = false;
 
   constructor(
@@ -45,26 +46,42 @@ export class ExerciseComponent implements OnInit{
     });
 
     this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
-      console.log(pianoKeys)
       const iteration = this.exercise.iterations[this.iterationIndex];
-      const spelledPitchClass = new SpelledPitchClass(
+      const iterationPitchClass = PitchClass.fromSpelledPitchClass(new SpelledPitchClass(
         iteration.noteLetter,
-        iteration.accidental);
-      const targetPitchClass = PitchClass.fromSpelledPitchClass(spelledPitchClass);
-      console.log(targetPitchClass.integerNotation);
+        iteration.accidental));
 
-      const iterationNoteWasPlayed = pianoKeys.some(pk => {
-        return pk.pitchClass.integerNotation === targetPitchClass.integerNotation;
+      const chord = this.exercise.sequence[this.chordIndex];
+      const chordPitchClasses = chord.map(member => {
+        return new PitchClass(iterationPitchClass.integerNotation + member);
       });
 
-      if (iterationNoteWasPlayed) {
-        if (this.iterationIndex + 1 === this.exercise.iterations.length) {
-          this.complete = true;
-        }
-        else {
-          this.iterationIndex++;
+      // sort piano keys by ascending midi value
+      pianoKeys.sort((a, b) => {
+        return a.midiNote.number - b.midiNote.number;
+      });
+
+      let chordWasPlayed = true;
+      if (pianoKeys.length === chordPitchClasses.length){
+        for (let i = 0; i < pianoKeys.length; i++) {
+          if (new PitchClass(chord[i]).integerNotation !== pianoKeys[i].pitchClass.integerNotation) {
+            chordWasPlayed = false;
+            break;
+          }
         }
       }
+
+      if (chordWasPlayed) {
+        this.chordIndex++;
+        if (this.chordIndex >= this.exercise.sequence.length) {
+          this.chordIndex = 0;
+          this.iterationIndex++;
+          if (this.iterationIndex >= this.exercise.iterations.length){
+            this.complete = true;
+          }
+        }
+      }
+
     });
   }
 
