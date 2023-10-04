@@ -60,7 +60,7 @@ export class ExerciseEditComponent implements OnInit{
         };
       }),
       sequence: this.sequence.controls.map(chord => {
-        return (chord as FormArray).controls.map(member => member.value);
+        return (chord as FormArray).controls.map(member => parseInt(member.value));
       })
     }
 
