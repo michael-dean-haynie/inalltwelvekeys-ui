@@ -62,7 +62,9 @@ export class ExerciseService {
           }
         })
       }),
-      sequence: [[0]]
+      sequence: [
+        [0, 4, 7]
+      ]
     })
   }
 }

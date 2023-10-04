@@ -90,6 +90,8 @@ export class ExerciseComponent implements OnInit{
       }
 
     });
+
+    console.log(this.exercise);
   }
 
   get exercise(): Exercise {
