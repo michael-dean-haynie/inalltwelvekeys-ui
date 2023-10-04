@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ExerciseService} from "../exercise.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Exercise} from "../models/api/exercise";
@@ -7,14 +7,16 @@ import {WebsocketService} from "../websocket.service";
 import {PitchClass} from "../models/pitch-class";
 import {SpelledPitchClass} from "../models/spelled-pitch-class";
 import {Accidentals} from "../models/notation";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-exercise',
   templateUrl: './exercise.component.html',
   styleUrls: ['./exercise.component.scss']
 })
-export class ExerciseComponent implements OnInit{
+export class ExerciseComponent implements OnInit, OnDestroy{
   private _exercise: Exercise | undefined;
+  private subscriptions: Subscription[] = [];
   iterationIndex: number = 0;
   chordIndex: number = 0
   complete: boolean = false;
@@ -45,7 +47,7 @@ export class ExerciseComponent implements OnInit{
       }
     });
 
-    this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
+    this.subscriptions.push(this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
       console.log('exercise: :', this.exercise);
       const iteration = this.exercise.iterations[this.iterationIndex];
       const iterationPitchClass = PitchClass.fromSpelledPitchClass(new SpelledPitchClass(
@@ -84,14 +86,21 @@ export class ExerciseComponent implements OnInit{
           this.chordIndex = 0;
           this.iterationIndex++;
           if (this.iterationIndex >= this.exercise.iterations.length){
+            this.iterationIndex = 0;
             this.complete = true;
           }
         }
       }
 
-    });
+    }));
 
     console.log(this.exercise);
+  }
+
+  ngOnDestroy(): void {
+    for (let subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 
   get exercise(): Exercise {
