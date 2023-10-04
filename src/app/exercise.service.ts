@@ -49,7 +49,6 @@ export class ExerciseService {
 
   private seed(): void {
     this.exercises.push({
-      // id: uuidv4(),
       id: 'fd7259d3-ec4e-4da6-9bc0-47cab51b3fad',
       name: 'Single Notes',
       description: '',
@@ -68,7 +67,6 @@ export class ExerciseService {
     });
 
     this.exercises.push({
-      // id: uuidv4(),
       id: 'qr7259d4-ec8e-4d26-9bc0-47cfb51b3fad',
       name: 'Major Triads',
       description: '',
@@ -87,7 +85,6 @@ export class ExerciseService {
     });
 
     this.exercises.push({
-      // id: uuidv4(),
       id: 'asg8x9d4-ec8e-4d26-9bc0-47cfb51b32zz',
       name: 'Major 2-5-1 Progression (One Hand, Closed)',
       description: '',
@@ -104,6 +101,37 @@ export class ExerciseService {
         [0, 4, 5, 9],
         [11, 4, 5, 9],
         [11, 2, 4, 7],
+      ]
+    });
+    this.exercises.push({
+      id: '4d545157-efa1-4127-8935-5bc7eea16d0a',
+      name: 'Altered Scale (Asc, Desc)',
+      description: '',
+      iterations: Object.values(NoteLetters).flatMap(letter => {
+        return Object.values(Accidentals).map(accidental => {
+          return {
+            noteLetter: letter,
+            accidental: accidental,
+            enabled: [Accidentals.Flat, Accidentals.Natural, Accidentals.Sharp].some(acc => acc === accidental)
+          }
+        })
+      }),
+      sequence: [
+        [0],
+        [1],
+        [3],
+        [4],
+        [6],
+        [8],
+        [10],
+        [0],
+        [10],
+        [8],
+        [6],
+        [4],
+        [3],
+        [1],
+        [0]
       ]
     });
   }
