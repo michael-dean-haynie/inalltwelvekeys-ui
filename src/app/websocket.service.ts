@@ -32,6 +32,11 @@ export class WebsocketService {
         } else if (midiMsg.type === 'note_off') {
           this.pianoKeys = this.pianoKeys.filter(pk => pk.midiNote.number !== midiMsg.note)
         }
+
+        // sort piano keys by ascending midi value
+        this.pianoKeys.sort((a, b) => {
+          return a.midiNote.number - b.midiNote.number;
+        });
         return JSON.parse(JSON.stringify(this.pianoKeys)) as PianoKey[];
       })
     );

@@ -10,19 +10,20 @@ import {Chord, Midi, Note} from "tonal";
 })
 export class ChordDetectorComponent implements OnInit, OnDestroy{
   private subscriptions: Subscription[] = []
+  flats: string[] = [];
+  sharps: string[] = [];
+  flatsChords: string[] = [];
+  sharpsChords: string[] = [];
 
   constructor(private websocketService: WebsocketService) {
   }
 
   ngOnInit(): void {
     this.subscriptions.push(this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
-      const asFlats = pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number));
-      const asSharps = pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number, { sharps: true }));
-      console.log('flats: ', asFlats);
-      console.log('sharps: ', asSharps);
-      console.log('flatsChords: ', Chord.detect(asFlats.map(note => Note.pitchClass(note))));
-      console.log('sharpsChords: ', Chord.detect(asSharps.map(note => Note.pitchClass(note))));
-
+      this.flats = pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number));
+      this.sharps = pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number, { sharps: true }));
+      this.flatsChords = Chord.detect(this.flats.map(note => Note.pitchClass(note)));
+      this.sharpsChords = Chord.detect(this.sharps.map(note => Note.pitchClass(note)));
     }));
   }
 
