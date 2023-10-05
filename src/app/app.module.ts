@@ -13,6 +13,7 @@ import { ExerciseEditComponent } from './exercise-edit/exercise-edit.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { NavComponent } from './nav/nav.component';
+import { ChordDetectorComponent } from './chord-detector/chord-detector.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { NavComponent } from './nav/nav.component';
     ExerciseComponent,
     ExercisesComponent,
     ExerciseEditComponent,
-    NavComponent
+    NavComponent,
+    ChordDetectorComponent
   ],
   imports: [
     BrowserModule,
