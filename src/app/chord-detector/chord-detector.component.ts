@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from "rxjs";
 import {WebsocketService} from "../websocket.service";
-import {Midi} from "tonal";
+import {Chord, Midi, Note} from "tonal";
 
 @Component({
   selector: 'app-chord-detector',
@@ -16,7 +16,13 @@ export class ChordDetectorComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.subscriptions.push(this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
-      console.log(pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number)))
+      const asFlats = pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number));
+      const asSharps = pianoKeys.map(pk => Midi.midiToNoteName(pk.midiNote.number, { sharps: true }));
+      console.log('flats: ', asFlats);
+      console.log('sharps: ', asSharps);
+      console.log('flatsChords: ', Chord.detect(asFlats.map(note => Note.pitchClass(note))));
+      console.log('sharpsChords: ', Chord.detect(asSharps.map(note => Note.pitchClass(note))));
+
     }));
   }
 
