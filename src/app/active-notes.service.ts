@@ -26,12 +26,13 @@ export class ActiveNotesService implements OnDestroy {
     }));
 
     // subscribe to midi events from the browser
-    this.subscriptions.push(this.webmidiService.noteMessageEventSubject.subscribe(noteMessageEvent => {
-      if (noteMessageEvent.type === 'noteon') {
-        this.handleNoteOnMidiEvent(noteMessageEvent.note.number);
+    this.subscriptions.push(this.webmidiService.messageSubject.subscribe(message => {
+      const midiNoteNumber = message.data[1];
+      if (message.type === 'noteon') {
+        this.handleNoteOnMidiEvent(midiNoteNumber);
       }
-      if (noteMessageEvent.type === 'noteoff') {
-        this.handleNoteOffMidiEvent(noteMessageEvent.note.number);
+      if (message.type === 'noteoff') {
+        this.handleNoteOffMidiEvent(midiNoteNumber);
       }
     }));
   }
