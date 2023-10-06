@@ -38,6 +38,7 @@ export class WebmidiService {
     });
 
 
+    document.body.innerHTML += `<div>typeof requestMIDIAccess: ${typeof window.navigator.requestMIDIAccess}</div>`
     if (!!window.navigator.requestMIDIAccess) {
       document.body.innerHTML += `<div>requestMIDIAccess is a thing</div>`
       document.body.innerHTML += `<div>typeof requestMIDIAccess: ${typeof window.navigator.requestMIDIAccess}</div>`
