@@ -14,10 +14,25 @@ export class WebmidiService {
 
   private async initialize(): Promise<void> {
 
-    window.navigator.requestMIDIAccess().then((access) => {
-      document.body.innerHTML += `<div>we got midi access</div>`
-    });
+    window.navigator.requestMIDIAccess().then(
+      (access) => {
+        document.body.innerHTML += `<div>we got midi access</div>`
+      },
+      (reason) => {
+        document.body.innerHTML += `<div>we did not got midi access</div>`
+        document.body.innerHTML += `<div>${reason}</div>`
+        document.body.innerHTML += `<div>${JSON.stringify(reason)}</div>`
+      }
+    );
 
+    window.navigator.permissions.query(<PermissionDescriptor>{name: "midi"}).then((result) => {
+      if (result.state === "granted") {
+        // Access granted.
+      } else if (result.state === "prompt") {
+        // Using API will prompt for permission
+      }
+      // Permission was denied by user prompt or permission policy
+    });
 
 
     await WebMidi.enable();
