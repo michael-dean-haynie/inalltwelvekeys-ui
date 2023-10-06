@@ -51,11 +51,10 @@ export class WebmidiService {
     var midiOutputs = null;
 
     function setup() {
-      var messagelog = document.body;
       if (window.navigator.requestMIDIAccess) {
-        window.navigator.requestMIDIAccess().then( success, function() { messagelog.innerHTML += "requestMIDIAccess() failed."; });
+        window.navigator.requestMIDIAccess().then( success, function() { window.document.body.innerHTML += "requestMIDIAccess() failed."; });
       } else {
-        messagelog.innerHTML += "Web MIDI API is not available on your browser.\n";
+        window.document.body.innerHTML += "Web MIDI API is not available on your browser.\n";
       }
 
       function setupEventHandler() {
@@ -71,8 +70,7 @@ export class WebmidiService {
         }
         for (var port = 0; port < inputs.length; port++) {
           var str = "input port:" + port + ", name: " + inputs[port].name;
-          var messagelog = document.getElementById('messagelog');
-          messagelog.innerHTML += str + "\n";
+          window.document.body.innerHTML += str + "\n";
 
           (function () {
             var _port = port;
@@ -82,15 +80,13 @@ export class WebmidiService {
                 str += event.data[i].toString(16) + " ";
               }
 
-              var messagelog = document.getElementById('messagelog');
-              messagelog.innerHTML += str + "\n";
-              messagelog.scrollTop = messagelog.scrollHeight;
+              window.document.body.innerHTML += str + "\n";
+              window.document.body.scrollTop = window.document.body.scrollHeight;
             };
 
             inputs[_port].ondisconnect = function (event) {
               var str = "input port:" + _port + ", disconnected.";
-              var messagelog = document.getElementById('messagelog');
-              messagelog.innerHTML += str + "\n";
+              window.document.body.innerHTML += str + "\n";
             };
           }());
         }
@@ -110,8 +106,7 @@ export class WebmidiService {
             var _port = port;
             outputs[_port].ondisconnect = function (event) {
               var str = "output port:" + _port + ", disconnected.";
-              var messagelog = document.getElementById('messagelog');
-              messagelog.innerHTML += str + "\n";
+              window.document.body.innerHTML += str + "\n";
             };
           }());
         }
@@ -125,8 +120,7 @@ export class WebmidiService {
 
         midiAccess.onconnect = function (event) {
           var str = "port: " + event.port.name + ", connected.";
-          var messagelog = document.getElementById('messagelog');
-          messagelog.innerHTML += str + "\n";
+          window.document.body.innerHTML += str + "\n";
 
           setupEventHandler();
         }
@@ -135,43 +129,10 @@ export class WebmidiService {
       }
     }
 
-    function noteOn() {
-      if (typeof midiAccess.outputs === "function") {
-        var outputs = midiAccess.outputs();
-        for (var i = 0; i < outputs.length; i++) {
-          var output = outputs[i];
-          output.send( [0x90, 60, 0x40] , window.performance.now() );
-        }
-      } else {
-        var iter = midiAccess.outputs.values();
-        for (var o = iter.next(); !o.done; o = iter.next()) {
-          o.value.send( [0x90, 60, 0x40] , window.performance.now() );
-        }
-      }
-    }
-
-    function noteOff() {
-      if (typeof midiAccess.outputs === "function") {
-        var outputs = midiAccess.outputs();
-        for (var i = 0; i < outputs.length; i++) {
-          var output = outputs[i];
-          output.send( [0x80, 60, 0x00] , window.performance.now() );
-        }
-      } else {
-        var iter = midiAccess.outputs.values();
-        for (var o = iter.next(); !o.done; o = iter.next()) {
-          o.value.send( [0x80, 60, 0x00] , window.performance.now() );
-        }
-      }
-    }
-
-    function clearLog() {
-      document.getElementById("messagelog").innerHTML = "";
-    }
-
     window.onload = function() {
       setup();
     }
+    setup();
 
     // await WebMidi.enable();
     // for (let input of WebMidi.inputs) {
