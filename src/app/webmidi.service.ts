@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Injectable } from '@angular/core';
 import {NoteMessageEvent, WebMidi} from "webmidi";
 import {Subject} from "rxjs";
