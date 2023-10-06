@@ -169,7 +169,9 @@ export class WebmidiService {
       document.getElementById("messagelog").innerHTML = "";
     }
 
-    setup();
+    window.onload = function() {
+      setup();
+    }
 
     // await WebMidi.enable();
     // for (let input of WebMidi.inputs) {
