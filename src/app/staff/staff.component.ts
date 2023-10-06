@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {MidiMessage} from "../models/api/midi-message";
 import {VexFlowAdapter} from "../models/vex-flow/vex-flow-adapter";
-import {WebsocketService} from "../websocket.service";
 import {Subscription} from "rxjs";
+import {ActiveNotesService} from "../active-notes.service";
 
 @Component({
   selector: 'app-staff',
@@ -13,11 +12,11 @@ export class StaffComponent implements OnInit{
   private _vexFlowAdapter: VexFlowAdapter | undefined;
   private _websocketSubscription: Subscription | undefined;
 
-  constructor(private websocketService: WebsocketService) {}
+  constructor(private activeNotesService: ActiveNotesService) {}
 
   ngOnInit(): void {
     this.initializeVexFlowAdapter();
-    this.initializeWebSocket();
+    this.initializeActiveNotesSubscription();
   }
 
   ngOnDestroy(): void {
@@ -37,15 +36,9 @@ export class StaffComponent implements OnInit{
     this._vexFlowAdapter = new VexFlowAdapter('vexFlowContainer');
   }
 
-  private initializeWebSocket(): void {
-    this._websocketSubscription = this.websocketService.messageEventSubject.subscribe((messageEvent) => {
-      if (messageEvent.data) {
-        const midiMessage: MidiMessage = JSON.parse(messageEvent.data);
-
-        if (['note_on', 'note_off'].includes(midiMessage.type)) {
-          this.vexFlowAdapter.update(midiMessage)
-        }
-      }
+  private initializeActiveNotesSubscription(): void {
+    this._websocketSubscription = this.activeNotesService.activeNotesSubject.subscribe(activeNotes => {
+      this.vexFlowAdapter.update(activeNotes)
     });
   }
 

@@ -4,36 +4,26 @@ import {MidiNote} from "../midi-note";
 import {PianoKey} from "../piano-key";
 import {PitchClass} from "../pitch-class";
 import {INoteValue} from "piano-chart";
+import {Midi, Note} from "tonal";
 
 export class VexFlowAdapter {
   private readonly factoryOptions: FactoryOptions;
-  private notes: MidiNote[] = []
+  private activeNotes: number[] = [];
 
   constructor(private containerId: string) {
     this.factoryOptions = {
       renderer: {
         elementId: this.containerId,
         width: 500,
-        height: 300
+        height: 600
       }
     };
 
     this.render()
   }
 
-  update(midiMessage: MidiMessage): void {
-    if (midiMessage.type === "note_on") {
-      const midiNote = new MidiNote(midiMessage.note);
-      if (!this.notes.some(note => note.number === midiNote.number)) {
-        this.notes.push(midiNote);
-      }
-    }
-
-    if (midiMessage.type === "note_off") {
-      const midiNote = new MidiNote(midiMessage.note);
-      this.notes = this.notes.filter(note => note.number !== midiNote.number);
-    }
-
+  update(activeNotes: number[]): void {
+    this.activeNotes = [...activeNotes];
     this.render();
   }
 
@@ -58,19 +48,25 @@ export class VexFlowAdapter {
     });
 
     let trebleVoices: Voice[] = []
-    if (this.trebleKeys.length) {
+    if (this.trebleNotes.length) {
       trebleVoices.push(score.voice(score.notes(this.trebleLine)));
     }
     system.addStave({
-      voices: trebleVoices
+      voices: trebleVoices,
+      options: {
+        space_above_staff_ln: 20
+      }
     }).addClef('treble');
 
     const bassVoices: Voice[] = []
-    if (this.bassKeys.length) {
+    if (this.bassNotes.length) {
       bassVoices.push(score.voice(score.notes(this.bassLine, {clef: 'bass'})))
     }
     system.addStave({
-      voices: bassVoices
+      voices: bassVoices,
+      options: {
+        space_above_staff_ln: 20
+      }
     }).addClef('bass');
 
     system.addConnector();
@@ -80,53 +76,34 @@ export class VexFlowAdapter {
   }
 
 
-  private get trebleKeys(): PianoKey[] {
-    return this.notes
-      .map(midiNote => new PianoKey(midiNote))
-      .filter(pianoKey => pianoKey.octave >= 4 && pianoKey.pitchClass.integerNotation >= 0);
+  private get trebleNotes(): string[] {
+    return this.activeNotes
+      .map(activeNote => Note.get(Midi.midiToNoteName(activeNote)))
+      .filter(note => (note.oct || 0) >= 4)
+      .map(note => note.name);
   }
 
-  private get bassKeys(): PianoKey[] {
-    return this.notes
-      .map(midiNote => new PianoKey(midiNote))
-      .filter(pianoKey => pianoKey.octave < 4);
+  private get bassNotes(): string[] {
+    return this.activeNotes
+      .map(activeNote => Note.get(Midi.midiToNoteName(activeNote)))
+      .filter(note => (note.oct || 0) < 4)
+      .map(note => note.name);
   }
 
   private get trebleLine(): string {
-    const noteNames = this.trebleKeys
-      .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave);
-    if (noteNames.length === 1) {
-      return `${noteNames.join(' ')}/w`
+    if (this.trebleNotes.length === 1) {
+      return `${this.trebleNotes.join(' ')}/w`
     }
-    return `(${noteNames.join('')})/w`;
+    return `(${this.trebleNotes.join('')})/w`;
   }
 
   private get bassLine(): string {
-    const noteNames = this.bassKeys
-      .map(pianoKey => this.getNoteNameForPitchClass(pianoKey.pitchClass) + pianoKey.octave);
-    if (noteNames.length === 1) {
-      return `${noteNames.join(' ')}/w`
+    if (this.bassNotes.length === 1) {
+      return `${this.bassNotes.join(' ')}/w`
     }
-    return `(${noteNames.join('')})/w`;
+    return `(${this.bassNotes.join('')})/w`;
   }
 
-  private getNoteNameForPitchClass(pitchClass: PitchClass) {
-    const noteNameMap: string[] = [
-      "C",
-      "Db",
-      "D",
-      "Eb",
-      "E",
-      "F",
-      "Gb",
-      "G",
-      "Ab",
-      "A",
-      "Bb",
-      "B",
-    ];
-    return noteNameMap[pitchClass.integerNotation];
-  }
 }
 
 

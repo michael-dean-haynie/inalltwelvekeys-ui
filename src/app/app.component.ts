@@ -11,12 +11,11 @@ import {WebmidiService} from "./webmidi.service";
 })
 export class AppComponent {
   title = `inalltwelvekeys-ui (${(environment as any).name})`;
+  myArray: string[] = [];
 
-  // force websocket to initialize
-  // force webmidi to initialize
   constructor(
-    private websocketService: WebsocketService,
-    private webmidiService: WebmidiService
+    // private websocketService: WebsocketService,
+    // private webmidiService: WebmidiService
   ) {
   }
 
@@ -24,4 +23,7 @@ export class AppComponent {
     console.log(param);
   }
 
+  handleClick(): void {
+    this.myArray.push('a');
+  }
 }

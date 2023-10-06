@@ -1,36 +1,18 @@
-import {INoteValue, Instrument, NoteValue} from "piano-chart";
-import {PianoKey} from "../piano-key";
-import {MidiNote} from "../midi-note";
+import {Instrument} from "piano-chart";
+import {Midi} from "tonal";
 
 export class PianoChartAdapter {
+  private activeNotes: number[] = [];
+
   constructor(private instrument: Instrument) {}
 
-  public keyDown(midiNote: MidiNote) {
-    this.instrument.keyDown(this.convertMidiNoteToNoteValue(midiNote))
-  }
-
-  public keyUp(midiNote: MidiNote) {
-    this.instrument.keyUp(this.convertMidiNoteToNoteValue(midiNote))
-  }
-
-  private convertMidiNoteToNoteValue(midiNote: MidiNote): INoteValue {
-    const pianoKey = new PianoKey(midiNote);
-    const pianoKeyMap: INoteValue[] = [
-      { note: "C", octave: pianoKey.octave },
-      { note: "D", octave: pianoKey.octave, accidental: "b"},
-      { note: "D", octave: pianoKey.octave },
-      { note: "E", octave: pianoKey.octave, accidental: "b"},
-      { note: "E", octave: pianoKey.octave },
-      { note: "F", octave: pianoKey.octave },
-      { note: "G", octave: pianoKey.octave, accidental: "b"},
-      { note: "G", octave: pianoKey.octave },
-      { note: "A", octave: pianoKey.octave, accidental: "b"},
-      { note: "A", octave: pianoKey.octave },
-      { note: "B", octave: pianoKey.octave, accidental: "b"},
-      { note: "B", octave: pianoKey.octave },
-    ];
-
-    const noteValue = pianoKeyMap[pianoKey.pitchClass.integerNotation];
-    return noteValue;
+  updateActiveNotes(updatedActiveNotes: number[]){
+    for (let activeNote of this.activeNotes) {
+      this.instrument.keyUp(Midi.midiToNoteName(activeNote));
+    }
+    for (let activeNote of updatedActiveNotes) {
+      this.instrument.keyDown(Midi.midiToNoteName(activeNote));
+    }
+    this.activeNotes = [...updatedActiveNotes];
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Enumerations, Input, Message, NoteMessageEvent, WebMidi} from "webmidi";
+import {NoteMessageEvent, WebMidi} from "webmidi";
 import {Subject} from "rxjs";
 
 @Injectable({
@@ -9,7 +9,7 @@ export class WebmidiService {
   readonly noteMessageEventSubject: Subject<NoteMessageEvent> = new Subject<NoteMessageEvent>();
 
   constructor() {
-    this.initialize();
+    this.initialize().then(_ => _);
   }
 
   private async initialize(): Promise<void> {
