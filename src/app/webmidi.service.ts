@@ -13,6 +13,13 @@ export class WebmidiService {
   }
 
   private async initialize(): Promise<void> {
+
+    window.navigator.requestMIDIAccess().then((access) => {
+      document.body.innerHTML += `<div>we got midi access</div>`
+    });
+
+
+
     await WebMidi.enable();
     for (let input of WebMidi.inputs) {
       const noteOnListener = input.addListener("noteon", noteMessageEvent => {
