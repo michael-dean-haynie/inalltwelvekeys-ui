@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {ExerciseService} from "../exercise.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Exercise} from "../models/api/exercise";
@@ -8,6 +8,8 @@ import {PitchClass} from "../models/pitch-class";
 import {SpelledPitchClass} from "../models/spelled-pitch-class";
 import {Accidentals} from "../models/notation";
 import {Subscription} from "rxjs";
+import {ActiveNotesService} from "../active-notes.service";
+import {Midi, Note} from "tonal";
 
 @Component({
   selector: 'app-exercise',
@@ -25,7 +27,8 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     private route: ActivatedRoute,
     private router: Router,
     private exerciseService: ExerciseService,
-    private websocketService: WebsocketService
+    private activeNotesService: ActiveNotesService,
+    private ref: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +50,7 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       }
     });
 
-    this.subscriptions.push(this.websocketService.pianoKeysChangesSubject.subscribe(pianoKeys => {
+    this.subscriptions.push(this.activeNotesService.activeNotesSubject.subscribe(activeNotes => {
       console.log('exercise: :', this.exercise);
       const iteration = this.exercise.iterations[this.iterationIndex];
       const iterationPitchClass = PitchClass.fromSpelledPitchClass(new SpelledPitchClass(
@@ -60,17 +63,14 @@ export class ExerciseComponent implements OnInit, OnDestroy{
         return new PitchClass(iterationPitchClass.integerNotation + member);
       });
       console.log('chordPitchClasses: ', chordPitchClasses);
-
-      // sort piano keys by ascending midi value
-      pianoKeys.sort((a, b) => {
-        return a.midiNote.number - b.midiNote.number;
-      });
-      console.log('pianoKeys: ', pianoKeys);
+      console.log('activeNotes: ', activeNotes)
+      console.log('activeNotesChromas: ', activeNotes.map(an => Note.get(Midi.midiToNoteName(an)).chroma))
 
       let chordWasPlayed = true;
-      if (pianoKeys.length === chordPitchClasses.length){
+      if (activeNotes.length === chordPitchClasses.length){
         for (let i = 0; i < chordPitchClasses.length; i++) {
-          if (chordPitchClasses[i].integerNotation !== pianoKeys[i].pitchClass.integerNotation) {
+          if (chordPitchClasses[i].integerNotation !== Note.get(Midi.midiToNoteName(activeNotes[i])).chroma) {
+            console.log('chord was not played')
             chordWasPlayed = false;
             break;
           }
@@ -78,9 +78,11 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       }
       else {
         chordWasPlayed = false;
+        console.log('chord was not played')
       }
 
       if (chordWasPlayed) {
+        console.log('chord was played')
         this.chordIndex++;
         if (this.chordIndex >= this.exercise.sequence.length) {
           this.chordIndex = 0;
@@ -92,6 +94,9 @@ export class ExerciseComponent implements OnInit, OnDestroy{
         }
       }
 
+      // for some reason change detection not getting triggered automatically
+      this.ref.markForCheck();
+      this.ref.detectChanges();
     }));
 
     console.log(this.exercise);
