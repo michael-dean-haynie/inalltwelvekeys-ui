@@ -34,7 +34,8 @@ export class WebmidiService {
       // Permission was denied by user prompt or permission policy
     });
 
-    if (window.navigator.requestMIDIAccess) {
+
+    if (!!window.navigator.requestMIDIAccess) {
       document.body.innerHTML += `<div>requestMIDIAccess is a thing</div>`
     } else {
       document.body.innerHTML += `<div>requestMIDIAccess is not a thing</div>`
