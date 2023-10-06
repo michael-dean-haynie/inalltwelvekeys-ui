@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import {WebMidi} from "webmidi";
+import {Enumerations, Input, Message, NoteMessageEvent, WebMidi} from "webmidi";
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebmidiService {
+  readonly noteMessageEventSubject: Subject<NoteMessageEvent> = new Subject<NoteMessageEvent>();
 
   constructor() {
     this.initialize();
@@ -13,7 +15,12 @@ export class WebmidiService {
   private async initialize(): Promise<void> {
     await WebMidi.enable();
     for (let input of WebMidi.inputs) {
-      console.log(input.manufacturer, input.name);
+      const noteOnListener = input.addListener("noteon", noteMessageEvent => {
+        this.noteMessageEventSubject.next(noteMessageEvent);
+      });
+      const noteOffListener = input.addListener("noteoff", noteMessageEvent => {
+        this.noteMessageEventSubject.next(noteMessageEvent);
+      });
     }
   }
 }

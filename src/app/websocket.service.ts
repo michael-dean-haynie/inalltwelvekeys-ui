@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import {filter, map, Subject} from "rxjs";
+import {Injectable, OnDestroy} from '@angular/core';
+import {filter, map, Observable, Subject, Subscription} from "rxjs";
 import { webSocket} from "rxjs/webSocket";
 import {environment} from "../environments/environment";
 import {PianoKey} from "./models/piano-key";
@@ -9,18 +9,20 @@ import {MidiNote} from "./models/midi-note";
 @Injectable({
   providedIn: 'root'
 })
-export class WebsocketService {
-  private readonly _websocketSubject: Subject<MessageEvent>;
+export class WebsocketService implements OnDestroy{
+  private readonly _messageEventSubject: Subject<MessageEvent>;
+  private readonly _midiMessageSubject: Subject<MidiMessage>;
   private pianoKeys: PianoKey[] = [];
   readonly pianoKeysChangesSubject: Subject<PianoKey[]> = new Subject<PianoKey[]>();
+  private subscriptions: Subscription[] = [];
 
-  constructor() {
-    this._websocketSubject = webSocket<MessageEvent>({
+  constructor(){
+    this._messageEventSubject = webSocket<MessageEvent>({
       url: (environment as any).websocketUrl,
       deserializer: (messageEvent) => messageEvent
     });
 
-    const inter = this.websocketSubject.pipe(
+    const inter = this.messageEventSubject.pipe(
       map(messageEvent => JSON.parse(messageEvent.data)),
       filter(data => data['type'] === 'note_on' || data['type'] === 'note_off'),
       map<any, MidiMessage>(data => data as MidiMessage),
@@ -41,13 +43,36 @@ export class WebsocketService {
       })
     );
 
-    inter.subscribe(val => this.pianoKeysChangesSubject.next(val))
+    inter.subscribe(val => this.pianoKeysChangesSubject.next(val));
+
+    // pipe the midi messages out to their own subscribable subject for service consumers
+    this._midiMessageSubject = new Subject<MidiMessage>();
+    const midiMessageObservable: Observable<MidiMessage> = this.messageEventSubject.pipe(
+      filter(messageEvent => messageEvent.data !== undefined), // TODO: better check?
+      map(messageEvent => JSON.parse(messageEvent.data) as MidiMessage)
+    );
+    this.subscriptions.push(midiMessageObservable.subscribe(midiMessage => {
+      this.midiMessageSubject.next(midiMessage);
+    }));
   }
 
-  get websocketSubject(): Subject<MessageEvent> {
-    if (!this._websocketSubject){
+  get messageEventSubject(): Subject<MessageEvent> {
+    if (!this._messageEventSubject){
       throw new Error();
     }
-    return this._websocketSubject;
+    return this._messageEventSubject;
+  }
+
+  get midiMessageSubject(): Subject<MidiMessage> {
+    if (!this._midiMessageSubject){
+      throw new Error();
+    }
+    return this._midiMessageSubject;
+  }
+
+  ngOnDestroy(): void {
+    for (let subscription of this.subscriptions) {
+     subscription.unsubscribe();
+    }
   }
 }

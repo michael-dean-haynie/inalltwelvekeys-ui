@@ -55,7 +55,7 @@ export class PianoComponent implements OnInit, OnDestroy {
   }
 
   private initializeWebSocket(): void {
-    this._websocketSubscription = this.websocketService.websocketSubject.subscribe((messageEvent) => {
+    this._websocketSubscription = this.websocketService.messageEventSubject.subscribe((messageEvent) => {
       if (messageEvent.data) {
         const midiMessage: MidiMessage = JSON.parse(messageEvent.data);
 

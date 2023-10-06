@@ -15,7 +15,7 @@ export class RawMidiComponent implements OnInit {
   constructor(private websocketService: WebsocketService) {}
 
   ngOnInit(): void {
-    this._websocketSubscription = this.websocketService.websocketSubject.subscribe((messageEvent) => {
+    this._websocketSubscription = this.websocketService.messageEventSubject.subscribe((messageEvent) => {
       if (messageEvent.data) {
        this.websocketMessages.unshift(messageEvent.data);
       }
