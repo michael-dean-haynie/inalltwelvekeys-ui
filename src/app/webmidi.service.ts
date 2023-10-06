@@ -25,7 +25,7 @@ export class WebmidiService {
       }
     );
 
-    window.navigator.permissions.query(<PermissionDescriptor>{name: "midi"}).then((result) => {
+    window.navigator.permissions.query({name: "midi"} as PermissionDescriptor).then((result) => {
       if (result.state === "granted") {
         // Access granted.
       } else if (result.state === "prompt") {
