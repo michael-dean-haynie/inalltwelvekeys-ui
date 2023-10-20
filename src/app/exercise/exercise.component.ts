@@ -83,46 +83,47 @@ export class ExerciseComponent implements OnInit, OnDestroy{
   }
 
   formatBeat(beat: ExerciseBeat): string {
-    return `${beat.chordRomanNumeral}${beat.chordType} (${beat.chordVoicing.join(' ')})`
+    return `${beat.chordRomanNumeral}${beat.chordType || ''} (${beat.chordVoicing.join(' ')})`
   }
 
   private handleActiveNotesChanges(activeNotes: number[]) {
-    console.log('activeNotes: ', activeNotes);
-    let activeNotesMatchCurrentBeat = false;
+    if (this.exercise.beats.length) {
+      let activeNotesMatchCurrentBeat = false;
 
-    // get the chord root for the current beat (in the current key)
-    const chordRoot = Progression.fromRomanNumerals(this.currentKey, [this.currentBeat.chordRomanNumeral])[0];
-    const voicingBassNote = Note.transpose(chordRoot, this.currentBeat.chordVoicing[0]);
-    const activeNotesThatMatchBassNote = activeNotes
-      .map(Note.fromMidi)
-      .map(Note.get)
-      .filter(activeNote => activeNote.chroma === Note.get(voicingBassNote).chroma);
+      // get the chord root for the current beat (in the current key)
+      const chordRoot = Progression.fromRomanNumerals(this.currentKey, [this.currentBeat.chordRomanNumeral])[0];
+      const voicingBassNote = Note.transpose(chordRoot, this.currentBeat.chordVoicing[0]);
+      const activeNotesThatMatchBassNote = activeNotes
+        .map(Note.fromMidi)
+        .map(Note.get)
+        .filter(activeNote => activeNote.chroma === Note.get(voicingBassNote).chroma);
 
-    // check if there are any bass note matches that also have the rest of the chord voicing members at correct intervals
-    if (activeNotesThatMatchBassNote.length) {
-      activeNotesMatchCurrentBeat = activeNotesThatMatchBassNote.some(bassNoteMatch => {
-        const nonBassMemberIntervals = this.currentBeat.chordVoicing.slice(1);
-        if (!nonBassMemberIntervals.length) {
-          return true; // bass note was the only chord member
-        }
-        const bassInterval = this.currentBeat.chordVoicing[0];
-        const rootImmediatelyBelowBass = Note.transpose(
-          bassNoteMatch.name,
-          `-${bassInterval}`);
-        const nonBassMemberNotes = nonBassMemberIntervals.map(interval => Note.transpose(rootImmediatelyBelowBass, interval));
-        const nonBassMemberMidis = nonBassMemberNotes
-          .map(note => Note.get(note).midi || -1);
-        return nonBassMemberMidis
-          .every(midi => activeNotes.includes(midi));
-      });
-    }
+      // check if there are any bass note matches that also have the rest of the chord voicing members at correct intervals
+      if (activeNotesThatMatchBassNote.length) {
+        activeNotesMatchCurrentBeat = activeNotesThatMatchBassNote.some(bassNoteMatch => {
+          const nonBassMemberIntervals = this.currentBeat.chordVoicing.slice(1);
+          if (!nonBassMemberIntervals.length) {
+            return true; // bass note was the only chord member
+          }
+          const bassInterval = this.currentBeat.chordVoicing[0];
+          const rootImmediatelyBelowBass = Note.transpose(
+            bassNoteMatch.name,
+            `-${bassInterval}`);
+          const nonBassMemberNotes = nonBassMemberIntervals.map(interval => Note.transpose(rootImmediatelyBelowBass, interval));
+          const nonBassMemberMidis = nonBassMemberNotes
+            .map(note => Note.get(note).midi || -1);
+          return nonBassMemberMidis
+            .every(midi => activeNotes.includes(midi));
+        });
+      }
 
-    if (activeNotesMatchCurrentBeat) {
-      this.progress();
+      if (activeNotesMatchCurrentBeat) {
+        this.progress();
+      }
     }
   }
 
-  private progress() {
+  progress(): void {
     this.beatIndex++;
 
     if (this.beatIndex >= this.exercise.beats.length) {
@@ -132,6 +133,36 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       if (this.keyIndex >= this.keys.length) {
         this.keyIndex = 0;
         this.complete = true;
+      }
+    }
+  }
+
+  progressKey(): void {
+    const initialKeyIndex = this.keyIndex
+    while(this.keyIndex === initialKeyIndex) {
+      this.progress();
+    }
+  }
+
+  regress(): void {
+    this.beatIndex--;
+
+    if (this.beatIndex < 0) {
+      this.beatIndex = this.exercise.beats.length - 1;
+      this.keyIndex--;
+
+      if (this.keyIndex < 0) {
+        this.keyIndex = 0;
+        this.beatIndex = 0;
+      }
+    }
+  }
+
+  regressKey(): void {
+    if (this.keyIndex > 0){
+      const initialKeyIndex = this.keyIndex
+      while(this.keyIndex === initialKeyIndex) {
+        this.regress();
       }
     }
   }

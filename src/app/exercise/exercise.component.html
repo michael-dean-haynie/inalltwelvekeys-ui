@@ -2,20 +2,18 @@
 <div>{{exercise.description}}</div>
 <div *ngIf="!complete">
   <div>Key: {{keys[keyIndex]}}</div>
-  <div>Beats:</div>
-  <div *ngFor="let beat of exercise.beats; index as beatIdx">
-    <span>{{formatBeat(beat)}}</span>
-    <span *ngIf="beatIndex === beatIdx">&nbsp;⬅</span>
+  <div *ngIf="exercise.beats.length">
+    <div>Beats:</div>
+    <div *ngFor="let beat of exercise.beats; index as beatIdx">
+      <span>{{formatBeat(beat)}}</span>
+      <span *ngIf="beatIndex === beatIdx">&nbsp;⬅</span>
+    </div>
   </div>
-<!--  <div *ngFor="let chord of exercise.sequence; index as i">-->
-<!--    <div class="chord">-->
-<!--      <span *ngFor="let member of chord; index as j" class="member">-->
-<!--        {{member}}-->
-<!--      </span>-->
-<!--      <span *ngIf="i === chordIndex">&nbsp;<&#45;&#45;</span>-->
-<!--    </div>-->
-<!--  </div>-->
+  <button (click)="regressKey()" type="button">Regress Key</button>
+  <button (click)="regress()" type="button">Regress</button>
+  <button (click)="progress()" type="button">Progress</button>
+  <button (click)="progressKey()" type="button">Progress Key</button>
 </div>
 <div *ngIf="complete">
-  YAY YOU COMPLETED THE EXERCISE!
+  YAY! YOU COMPLETED THE EXERCISE!
 </div>

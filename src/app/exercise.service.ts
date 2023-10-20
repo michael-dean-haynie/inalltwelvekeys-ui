@@ -4,6 +4,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 import {Accidentals, NoteLetters} from "./models/notation";
+import {Interval, RomanNumeral, ScaleType} from "tonal";
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +49,61 @@ export class ExerciseService {
   }
 
   private seed(): void {
+    this.exercises.push({
+      id: 'fd7259d3-ec4e-4db6-9bc0-4888b51b3fad',
+      name: 'Keys Only',
+      description: 'No beats, just the key',
+      beats: []
+    });
+
+    this.exercises.push({
+      id: 'fd7259d3-ec4e-4db6-9bc0-47cab51b3fad',
+      name: 'Single Notes',
+      description: '',
+      beats: [
+        {
+          chordRomanNumeral: 'I',
+          chordVoicing: ['1P']
+        }
+      ]
+    });
+
+    this.exercises.push({
+      id: 'fd7259d3-ec4e-4db6-9bc0-47cab51b888d',
+      name: 'Major Scale',
+      description: '(descending then ascending)',
+      beats: [
+          '8P', // start an 8ve above
+          ...[...ScaleType.get('major').intervals].reverse(), // descending (shallow copy, reversed)
+          ...ScaleType.get('major').intervals.slice(1), // ascending (not repeating tonic)
+          '8P', // end an 8ve above
+        ]
+        .map(intervalLit => Interval.get(intervalLit))
+        .map(interval => RomanNumeral.get(interval))
+        .map(romanNumeral => ({
+          chordRomanNumeral: romanNumeral.name,
+          chordVoicing: ['1P']
+        }))
+    });
+
+    this.exercises.push({
+      id: 'fd7333d3-ec4e-4db6-9bc0-47cab51b888d',
+      name: 'Altered Scale',
+      description: '(descending then ascending)',
+      beats: [
+        '8P', // start an 8ve above
+        ...[...ScaleType.get('altered').intervals].reverse(), // descending (shallow copy, reversed)
+        ...ScaleType.get('altered').intervals.slice(1), // ascending (not repeating tonic)
+        '8P', // end an 8ve above
+      ]
+        .map(intervalLit => Interval.get(intervalLit))
+        .map(interval => RomanNumeral.get(interval))
+        .map(romanNumeral => ({
+          chordRomanNumeral: romanNumeral.name,
+          chordVoicing: ['1P']
+        }))
+    });
+
     this.exercises.push({
       id: 'fd7259d3-ec4e-4da6-9bc0-47cab51b3fad',
       name: 'Major II-V-I (open)',
