@@ -1,21 +1,29 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ExerciseService} from "../exercise.service";
 import {Exercise} from "../models/api/exercise";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-exercises',
   templateUrl: './exercises.component.html',
   styleUrls: ['./exercises.component.scss']
 })
-export class ExercisesComponent implements OnInit{
-  exercises: Exercise[] = []
+export class ExercisesComponent implements OnInit, OnDestroy{
+  exercises: Exercise[] = [];
+  private subscriptions: Subscription[] = [];
 
   constructor(private exerciseService: ExerciseService) {}
 
   ngOnInit(): void {
-    this.exerciseService.list().subscribe(result => {
+    this.subscriptions.push(this.exerciseService.list().subscribe(result => {
       this.exercises = result;
-    })
+    }));
+  }
+
+  ngOnDestroy(): void {
+    for (let subscription of this.subscriptions) {
+     subscription.unsubscribe();
+    }
   }
 
 

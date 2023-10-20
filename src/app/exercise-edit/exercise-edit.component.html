@@ -1,30 +1,57 @@
 <form *ngIf="modeIsCreate || modeIsUpdate" [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
   <input formControlName="name" placeholder="Exercise Name">
   <input formControlName="description" placeholder="Exercise Description">
-  <div formArrayName="iterations">
-    <div>Iterations (Keys)</div>
-    <div *ngFor="let iteration of iterations.controls; index as i">
-      <div formGroupName="{{i}}">
-<!--        <input formControlName="noteLetter" placeholder="B">-->
-<!--        <input formControlName="accidental" placeholder="♭">-->
-        <span>{{iteration.get('noteLetter')?.value}}</span>
-        <span>{{iteration.get('accidental')?.value}}</span>
-        <input type="checkbox" formControlName="enabled">
+<!-- rework/remove iterations -->
+<!--  <div formArrayName="iterations">-->
+<!--    <div>Iterations (Keys)</div>-->
+<!--    <div *ngFor="let iteration of iterations.controls; index as i">-->
+<!--      <div formGroupName="{{i}}">-->
+<!--&lt;!&ndash;        <input formControlName="noteLetter" placeholder="B">&ndash;&gt;-->
+<!--&lt;!&ndash;        <input formControlName="accidental" placeholder="♭">&ndash;&gt;-->
+<!--        <span>{{iteration.get('noteLetter')?.value}}</span>-->
+<!--        <span>{{iteration.get('accidental')?.value}}</span>-->
+<!--        <input type="checkbox" formControlName="enabled">-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+  <!-- Beats -->
+  <div>
+    <div>Beats</div>
+    <div formArrayName="beats">
+      <div *ngFor="let beat of beats.controls; index as beatIdx">
+        <div formGroupName="{{beatIdx}}">
+          <div>Scale Degree of the Chord Root</div>
+          <input formControlName="chordRomanNumeral"/>
+
+          <div>Chord Type (Quality)</div>
+          <input formControlName="chordType"/>
+
+          <div>Chord Voicing</div>
+          <div formArrayName="chordVoicing">
+            <div *ngFor="let interval of getVoicingByBeatIndex(beatIdx).controls; index as intervalIdx">
+              <input formControlName="{{intervalIdx}}"/>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div formArrayName="sequence">
-    <div>Sequence (Chords)</div>
-    <div *ngFor="let chord of sequence.controls; index as i">
-      <span formArrayName="{{i}}">
-        <span *ngFor="let member of getChord(i).controls; index as j">
-          <input formControlName="{{j}}" placeholder="0">
-        </span>
-        <button type="button" (click)="addMemberToChord(i)">Add Chord Member</button>
-      </span>
-      <button type="button" (click)="deleteChord(i)">Delete Chord</button>
-    </div>
-    <button type="button" (click)="addChord()">Add Chord</button>
-  </div>
+
+<!--  rework beats -->
+<!--  <div formArrayName="sequence">-->
+<!--    <div>Sequence (Chords)</div>-->
+<!--    <div *ngFor="let chord of sequence.controls; index as i">-->
+<!--      <span formArrayName="{{i}}">-->
+<!--        <span *ngFor="let member of getChord(i).controls; index as j">-->
+<!--          <input formControlName="{{j}}" placeholder="0">-->
+<!--        </span>-->
+<!--        <button type="button" (click)="addMemberToChord(i)">Add Chord Member</button>-->
+<!--      </span>-->
+<!--      <button type="button" (click)="deleteChord(i)">Delete Chord</button>-->
+<!--    </div>-->
+<!--    <button type="button" (click)="addChord()">Add Chord</button>-->
+<!--  </div>-->
+
   <button>{{modeIsCreate ? "Create" : "Update" }}</button>
 </form>

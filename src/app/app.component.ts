@@ -11,7 +11,6 @@ import {WebmidiService} from "./webmidi.service";
 })
 export class AppComponent {
   title = `inalltwelvekeys-ui (${(environment as any).name})`;
-  myArray: string[] = [];
 
   constructor(
     // private websocketService: WebsocketService,
@@ -21,9 +20,5 @@ export class AppComponent {
 
   private testTypes(param: Accidental) {
     console.log(param);
-  }
-
-  handleClick(): void {
-    this.myArray.push('a');
   }
 }

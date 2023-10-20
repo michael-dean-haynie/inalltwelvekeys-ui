@@ -3,13 +3,13 @@ import {ExerciseService} from "../exercise.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Exercise} from "../models/api/exercise";
 import {shuffleAlgo} from "../utilities/math-utilities";
-import {WebsocketService} from "../websocket.service";
 import {PitchClass} from "../models/pitch-class";
 import {SpelledPitchClass} from "../models/spelled-pitch-class";
 import {Accidentals} from "../models/notation";
 import {Subscription} from "rxjs";
 import {ActiveNotesService} from "../active-notes.service";
-import {Midi, Note} from "tonal";
+import {Interval, Midi, Note, Progression, ScaleType} from "tonal";
+import {ExerciseBeat} from "../models/api/exercise-beat";
 
 @Component({
   selector: 'app-exercise',
@@ -17,11 +17,12 @@ import {Midi, Note} from "tonal";
   styleUrls: ['./exercise.component.scss']
 })
 export class ExerciseComponent implements OnInit, OnDestroy{
+  keys: string[] = [];
+  keyIndex: number = 0;
+  beatIndex: number = 0;
+  complete: boolean = false;
   private _exercise: Exercise | undefined;
   private subscriptions: Subscription[] = [];
-  iterationIndex: number = 0;
-  chordIndex: number = 0
-  complete: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,7 +30,24 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     private exerciseService: ExerciseService,
     private activeNotesService: ActiveNotesService,
     private ref: ChangeDetectorRef
-  ) {}
+  ) {
+    this.keys = this.getShuffledKeys();
+  }
+
+  get exercise(): Exercise {
+    if (!this._exercise) {
+      throw new Error();
+    }
+    return this._exercise;
+  }
+
+  get currentKey(): string {
+    return this.keys[this.keyIndex];
+  }
+
+  get currentBeat(): ExerciseBeat {
+    return this.exercise.beats[this.beatIndex];
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -38,7 +56,6 @@ export class ExerciseComponent implements OnInit, OnDestroy{
         this.exerciseService.get(id).subscribe(exercise => {
           if (exercise) {
             this._exercise = exercise;
-            this.shuffle();
           }
           else {
             this.router.navigate(['/404'], { skipLocationChange: true});
@@ -51,55 +68,12 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     });
 
     this.subscriptions.push(this.activeNotesService.activeNotesSubject.subscribe(activeNotes => {
-      console.log('exercise: :', this.exercise);
-      const iteration = this.exercise.iterations[this.iterationIndex];
-      const iterationPitchClass = PitchClass.fromSpelledPitchClass(new SpelledPitchClass(
-        iteration.noteLetter,
-        iteration.accidental));
-
-      const chord = this.exercise.sequence[this.chordIndex];
-      console.log('chord: ', chord);
-      const chordPitchClasses = chord.map(member => {
-        return new PitchClass(iterationPitchClass.integerNotation + member);
-      });
-      console.log('chordPitchClasses: ', chordPitchClasses);
-      console.log('activeNotes: ', activeNotes)
-      console.log('activeNotesChromas: ', activeNotes.map(an => Note.get(Midi.midiToNoteName(an)).chroma))
-
-      let chordWasPlayed = true;
-      if (activeNotes.length === chordPitchClasses.length){
-        for (let i = 0; i < chordPitchClasses.length; i++) {
-          if (chordPitchClasses[i].integerNotation !== Note.get(Midi.midiToNoteName(activeNotes[i])).chroma) {
-            console.log('chord was not played')
-            chordWasPlayed = false;
-            break;
-          }
-        }
-      }
-      else {
-        chordWasPlayed = false;
-        console.log('chord was not played')
-      }
-
-      if (chordWasPlayed) {
-        console.log('chord was played')
-        this.chordIndex++;
-        if (this.chordIndex >= this.exercise.sequence.length) {
-          this.chordIndex = 0;
-          this.iterationIndex++;
-          if (this.iterationIndex >= this.exercise.iterations.length){
-            this.iterationIndex = 0;
-            this.complete = true;
-          }
-        }
-      }
+      this.handleActiveNotesChanges(activeNotes);
 
       // for some reason change detection not getting triggered automatically
       this.ref.markForCheck();
       this.ref.detectChanges();
     }));
-
-    console.log(this.exercise);
   }
 
   ngOnDestroy(): void {
@@ -108,24 +82,64 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     }
   }
 
-  get exercise(): Exercise {
-    if (!this._exercise) {
-      throw new Error();
+  formatBeat(beat: ExerciseBeat): string {
+    return `${beat.chordRomanNumeral}${beat.chordType} (${beat.chordVoicing.join(' ')})`
+  }
+
+  private handleActiveNotesChanges(activeNotes: number[]) {
+    console.log('activeNotes: ', activeNotes);
+    let activeNotesMatchCurrentBeat = false;
+
+    // get the chord root for the current beat (in the current key)
+    const chordRoot = Progression.fromRomanNumerals(this.currentKey, [this.currentBeat.chordRomanNumeral])[0];
+    const voicingBassNote = Note.transpose(chordRoot, this.currentBeat.chordVoicing[0]);
+    const activeNotesThatMatchBassNote = activeNotes
+      .map(Note.fromMidi)
+      .map(Note.get)
+      .filter(activeNote => activeNote.chroma === Note.get(voicingBassNote).chroma);
+
+    // check if there are any bass note matches that also have the rest of the chord voicing members at correct intervals
+    if (activeNotesThatMatchBassNote.length) {
+      activeNotesMatchCurrentBeat = activeNotesThatMatchBassNote.some(bassNoteMatch => {
+        const nonBassMemberIntervals = this.currentBeat.chordVoicing.slice(1);
+        if (!nonBassMemberIntervals.length) {
+          return true; // bass note was the only chord member
+        }
+        const bassInterval = this.currentBeat.chordVoicing[0];
+        const rootImmediatelyBelowBass = Note.transpose(
+          bassNoteMatch.name,
+          `-${bassInterval}`);
+        const nonBassMemberNotes = nonBassMemberIntervals.map(interval => Note.transpose(rootImmediatelyBelowBass, interval));
+        const nonBassMemberMidis = nonBassMemberNotes
+          .map(note => Note.get(note).midi || -1);
+        return nonBassMemberMidis
+          .every(midi => activeNotes.includes(midi));
+      });
     }
-    return this._exercise;
+
+    if (activeNotesMatchCurrentBeat) {
+      this.progress();
+    }
   }
 
-  get prettyIteration(): string {
-    const iteration = this.exercise.iterations[this.iterationIndex];
-    return `${iteration.noteLetter}${iteration.accidental}`
-      .replace(Accidentals.Natural, ' ');
+  private progress() {
+    this.beatIndex++;
+
+    if (this.beatIndex >= this.exercise.beats.length) {
+      this.beatIndex = 0;
+      this.keyIndex++;
+
+      if (this.keyIndex >= this.keys.length) {
+        this.keyIndex = 0;
+        this.complete = true;
+      }
+    }
   }
 
-  shuffle(): void {
-    this.exercise.iterations.sort(shuffleAlgo);
-    this.exercise.iterations = this.exercise.iterations.filter(itr => itr.enabled);
-    console.log(this.exercise.iterations
-        .map(itr => `${itr.noteLetter}${itr.accidental}`)
-        .join(' '));
+  private getShuffledKeys(): string[] {
+    const keys = Note.names().flatMap(noteName => [`${noteName}b`, noteName, `${noteName}#`]);
+    keys.sort(shuffleAlgo);
+    console.log(keys);
+    return keys;
   }
 }

@@ -1,15 +1,21 @@
-<!--<button (click)="shuffle()">Shuffle</button>-->
+<div>Exercise: {{exercise.name}}</div>
+<div>{{exercise.description}}</div>
+<div *ngIf="!complete">
+  <div>Key: {{keys[keyIndex]}}</div>
+  <div>Beats:</div>
+  <div *ngFor="let beat of exercise.beats; index as beatIdx">
+    <span>{{formatBeat(beat)}}</span>
+    <span *ngIf="beatIndex === beatIdx">&nbsp;⬅</span>
+  </div>
+<!--  <div *ngFor="let chord of exercise.sequence; index as i">-->
+<!--    <div class="chord">-->
+<!--      <span *ngFor="let member of chord; index as j" class="member">-->
+<!--        {{member}}-->
+<!--      </span>-->
+<!--      <span *ngIf="i === chordIndex">&nbsp;<&#45;&#45;</span>-->
+<!--    </div>-->
+<!--  </div>-->
+</div>
 <div *ngIf="complete">
   YAY YOU COMPLETED THE EXERCISE!
-</div>
-<div *ngIf="!complete">
-  <div>Iteration (Key): {{prettyIteration}}</div>
-  <div *ngFor="let chord of exercise.sequence; index as i">
-    <div class="chord">
-      <span *ngFor="let member of chord; index as j" class="member">
-        {{member}}
-      </span>
-      <span *ngIf="i === chordIndex">&nbsp;<--</span>
-    </div>
-  </div>
 </div>
