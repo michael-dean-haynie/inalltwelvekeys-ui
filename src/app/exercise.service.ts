@@ -50,7 +50,7 @@ export class ExerciseService {
   private seed(): void {
     this.exercises.push({
       id: 'fd7259d3-ec4e-4da6-9bc0-47cab51b3fad',
-      name: 'Major II-V-I',
+      name: 'Major II-V-I (open)',
       description: 'Major II-V-I progressions, rootless voicing, (open)',
       beats: [
         {
@@ -67,6 +67,29 @@ export class ExerciseService {
           chordRomanNumeral: 'I',
           chordType: 'maj9',
           chordVoicing: ['3M', '5P', '7M', '9M']
+        },
+      ]
+    });
+
+    this.exercises.push({
+      id: 'fd7259f3-ec4e-4da6-9bc0-47cab51b3fad',
+      name: 'Major II-V-I (closed)',
+      description: 'Major II-V-I progressions, rootless voicing, (closed)',
+      beats: [
+        {
+          chordRomanNumeral: 'II',
+          chordType: 'min9',
+          chordVoicing: ['7m', '9M', '10m', '12P']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordType: '13',
+          chordVoicing: ['3M', '6M', '7m', '9M']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordType: 'maj9',
+          chordVoicing: ['7M', '9M', '10M', '12P']
         },
       ]
     });
