@@ -167,10 +167,39 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     }
   }
 
+  again(): void {
+    this.keys = this.getShuffledKeys();
+    this.keyIndex = 0;
+    this.beatIndex = 0;
+    this.complete = false;
+
+    // for some reason change detection not getting triggered automatically
+    this.ref.markForCheck();
+    this.ref.detectChanges();
+  }
+
   private getShuffledKeys(): string[] {
-    const keys = Note.names().flatMap(noteName => [`${noteName}b`, noteName, `${noteName}#`]);
-    keys.sort(shuffleAlgo);
-    console.log(keys);
+    const keys = [...Note.names()].flatMap(noteName => [`${noteName}b`, noteName, `${noteName}#`]);
+    do {
+      keys.sort(shuffleAlgo);
+      // console.log(keys);
+    } while (this.keysHasNeigboringEnharmonics(keys))
     return keys;
+  }
+
+  private keysHasNeigboringEnharmonics(keys: string[]): boolean {
+    if (keys.length < 2) {
+      return false;
+    }
+
+    const chromas = keys.map(keyLit => Note.get(keyLit).chroma);
+    for (let i = 1; i < chromas.length; i++) {
+      if (chromas[i] === chromas[i-1]){
+        // console.log(`detected same chroma (${chromas[i]}) for neighboring keys ${keys[i]} and ${keys[i-1]}`);
+        return true;
+      }
+    }
+
+    return false;
   }
 }

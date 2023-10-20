@@ -1,7 +1,7 @@
 <div>Exercise: {{exercise.name}}</div>
 <div>{{exercise.description}}</div>
 <div *ngIf="!complete">
-  <div>Key: {{keys[keyIndex]}}</div>
+  <div>Key: {{keys[keyIndex]}} ({{keyIndex + 1}}/{{keys.length}})</div>
   <div *ngIf="exercise.beats.length">
     <div>Beats:</div>
     <div *ngFor="let beat of exercise.beats; index as beatIdx">
@@ -16,4 +16,5 @@
 </div>
 <div *ngIf="complete">
   YAY! YOU COMPLETED THE EXERCISE!
+  <button (click)="again()" type="button">Again</button>
 </div>
