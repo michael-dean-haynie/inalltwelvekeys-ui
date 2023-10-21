@@ -9,10 +9,17 @@
       <span *ngIf="beatIndex === beatIdx">&nbsp;⬅</span>
     </div>
   </div>
-  <button (click)="regressKey()" type="button">Regress Key</button>
-  <button (click)="regress()" type="button">Regress</button>
-  <button (click)="progress()" type="button">Progress</button>
-  <button (click)="progressKey()" type="button">Progress Key</button>
+  <div class="mb-3">
+    <button (click)="regressKey()" type="button">Regress Key</button>
+    <button (click)="regress()" type="button">Regress</button>
+    <button (click)="progress()" type="button">Progress</button>
+    <button (click)="progressKey()" type="button">Progress Key</button>
+  </div>
+  <div class="mb-3">
+    <a routerLink="/exercise/edit/{{exercise.id}}">
+      <button class="btn btn-primary" type="button">Edit Exercise</button>
+    </a>
+  </div>
 </div>
 <div *ngIf="complete">
   YAY! YOU COMPLETED THE EXERCISE!

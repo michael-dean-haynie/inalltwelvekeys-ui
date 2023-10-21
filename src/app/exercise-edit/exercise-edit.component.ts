@@ -71,7 +71,7 @@ export class ExerciseEditComponent implements OnInit{
     });
   }
 
-  onSubmit(): void {
+  onSubmit(startExercise: boolean = false): void {
     const exercise: Exercise = {
       id: this.exerciseForm.get('id')?.value,
       name: this.exerciseForm.get('name')?.value,
@@ -90,12 +90,20 @@ export class ExerciseEditComponent implements OnInit{
 
     if (this.modeIsCreate) {
       this.exerciseService.create(exercise).subscribe(_ => {
-        this.router.navigate(['/exercises']);
+        if (startExercise) {
+          this.router.navigate(['/exercise', exercise.id]);
+        } else {
+          this.router.navigate(['/exercises']);
+        }
       });
     }
     else {
       this.exerciseService.update(exercise).subscribe(_ => {
-        this.router.navigate(['/exercises']);
+        if (startExercise) {
+          this.router.navigate(['/exercise', exercise.id]);
+        } else {
+          this.router.navigate(['/exercises']);
+        }
       });
     }
   }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="modeIsCreate || modeIsUpdate">
-  <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit(true)">
     <input formControlName="name" placeholder="Exercise Name">
     <input formControlName="description" placeholder="Exercise Description">
 
@@ -68,6 +68,6 @@
       </ng-container>
     </div>
 
-    <button>{{modeIsCreate ? "Create" : "Update" }}</button>
+    <button class="btn btn-primary">{{modeIsCreate ? "Create" : "Update" }} and Start Exercise</button>
   </form>
 </ng-container>
