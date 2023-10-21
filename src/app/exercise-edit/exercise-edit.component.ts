@@ -3,8 +3,11 @@ import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ExerciseService} from "../exercise.service";
 import {Exercise} from "../models/api/exercise";
-import {Accidentals, NoteLetters} from "../models/notation";
 import { v4 as uuidv4 } from "uuid";
+import {Interval, RomanNumeral, ScaleType} from "tonal";
+import {ScalePattern} from "../utilities/scale-pattern";
+import {ExerciseBeat} from "../models/api/exercise-beat";
+import {posModRes} from "../utilities/math-utilities";
 
 @Component({
   selector: 'app-exercise-edit',
@@ -16,6 +19,7 @@ export class ExerciseEditComponent implements OnInit{
   modeIsCreate = false;
   modeIsUpdate = false;
   exerciseForm: FormGroup = this.fb.group({});
+  scaleGeneratorForm: FormGroup = this.initializeScaleGeneratorForm();
 
   constructor(
     private route: ActivatedRoute,
@@ -26,6 +30,20 @@ export class ExerciseEditComponent implements OnInit{
 
   get beats(): FormArray {
     return this.exerciseForm.get('beats') as FormArray;
+  }
+
+  get scaleTypeOptions(): string[] {
+    return [...ScaleType.all()] // shallow copy
+      .map(scaleType => scaleType.name)
+      .sort(); // ascending by default
+  }
+
+  get patternOptions(): string[] {
+    return [...ScalePattern.names()];
+  }
+
+  get directionOptions(): string[] {
+    return [...ScalePattern.directions()];
   }
 
   getVoicingByBeatIndex(beatIdx: number): FormArray {
@@ -68,16 +86,6 @@ export class ExerciseEditComponent implements OnInit{
           }),
         };
       })
-      // iterations: this.iterations.controls.map(iteration => {
-      //   return {
-      //     noteLetter: iteration.get('noteLetter')?.value,
-      //     accidental: iteration.get('accidental')?.value,
-      //     enabled: iteration.get('enabled')?.value,
-      //   };
-      // }),
-      // sequence: this.sequence.controls.map(chord => {
-      //   return (chord as FormArray).controls.map(member => parseInt(member.value));
-      // })
     }
 
     if (this.modeIsCreate) {
@@ -92,29 +100,100 @@ export class ExerciseEditComponent implements OnInit{
     }
   }
 
-  // get iterations(): FormArray {
-  //   return this.exerciseForm.get('iterations') as FormArray;
-  // }
-  //
-  // get sequence(): FormArray {
-  //   return this.exerciseForm.get('sequence') as FormArray;
-  // }
+  generateScaleBeats(): void {
+    const selectedScaleTypeLit = this.scaleGeneratorForm.get('scaleType')?.value;
+    const scaleType = ScaleType.get(selectedScaleTypeLit);
 
-  // getChord(index: number): FormArray {
-  //   return this.sequence.controls[index] as FormArray;
-  // }
+    const selectedPatternLit = this.scaleGeneratorForm.get('pattern')?.value;
+    const pattern = ScalePattern.get(selectedPatternLit);
 
-  // addChord(): void {
-  //   this.sequence.push(this.fb.array([0]));
-  // }
-  //
-  // deleteChord(index: number): void {
-  //   this.sequence.removeAt(index);
-  // }
-  //
-  // addMemberToChord(index: number): void {
-  //   this.getChord(index).push(this.fb.control(0))
-  // }
+    const direction = this.scaleGeneratorForm.get('direction')?.value;
+    const octaves = this.scaleGeneratorForm.get('octaves')?.value;
+
+    let scaleSteps: { interval: string, direction: 'ascending' | 'descending', finalForDirection: boolean }[] = []
+    switch (direction) {
+      case 'ascending':
+        for (let i = 0; i < octaves; i++) {
+          scaleSteps = scaleSteps.concat([...scaleType.intervals]
+            .map(interval => ({ interval, direction: 'ascending', finalForDirection: false })))
+        }
+        scaleSteps.push({ interval: '1P', direction: 'ascending', finalForDirection: true })
+        break;
+      case 'descending':
+        scaleSteps.push({ interval: '1P', direction: 'descending', finalForDirection: false });
+        for (let i = 0; i < octaves; i++) {
+          scaleSteps = scaleSteps.concat([...scaleType.intervals]
+            .reverse()
+            .map(interval => ({ interval, direction: 'descending', finalForDirection: false })))
+        }
+        scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        break;
+      case 'ascending then descending':
+        for (let i = 0; i < octaves; i++) {
+          scaleSteps = scaleSteps.concat([...scaleType.intervals]
+            .map(interval => ({ interval, direction: 'ascending', finalForDirection: false })))
+        }
+        scaleSteps.push({ interval: '1P', direction: 'ascending', finalForDirection: true })
+        scaleSteps.push({ interval: '1P', direction: 'descending', finalForDirection: false });
+        for (let i = 0; i < octaves; i++) {
+          scaleSteps = scaleSteps.concat([...scaleType.intervals]
+            .reverse()
+            .map(interval => ({ interval, direction: 'descending', finalForDirection: false })))
+        }
+        scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        break;
+      case 'descending then ascending':
+        scaleSteps.push({ interval: '1P', direction: 'descending', finalForDirection: false });
+        for (let i = 0; i < octaves; i++) {
+          scaleSteps = scaleSteps.concat([...scaleType.intervals]
+            .reverse()
+            .map(interval => ({ interval, direction: 'descending', finalForDirection: false })))
+        }
+        scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        for (let i = 0; i < octaves; i++) {
+          scaleSteps = scaleSteps.concat([...scaleType.intervals]
+            .map(interval => ({ interval, direction: 'ascending', finalForDirection: false })))
+        }
+        scaleSteps.push({ interval: '1P', direction: 'ascending', finalForDirection: true })
+        break;
+    }
+
+    const exerciseBeats: ExerciseBeat[] = scaleSteps
+      .flatMap(scaleStep => { // expand pattern for each scale step
+        if (!pattern) { throw new Error(); }
+        const patternSteps = scaleStep.finalForDirection ? [0] : [...pattern.steps] || [];
+        if (scaleStep.direction === 'descending') {
+          patternSteps.reverse();
+        }
+        const beatIntervals: string[] = patternSteps.map(pStep => {
+          const baseStep = scaleType.intervals.indexOf(scaleStep.interval);
+          const pStepIntervalIndex = posModRes(baseStep + pStep, scaleType.intervals.length);
+          return scaleType.intervals[pStepIntervalIndex];
+        });
+
+        if (pattern.addApproach) {
+          const approachInterval = Interval.substract(beatIntervals[0], '2m');
+          if (!approachInterval) { throw new Error(); }
+          beatIntervals.unshift(approachInterval);
+        }
+
+        return beatIntervals;
+      })
+      .map(intervalLit => ({ // map to exercise beat
+      chordRomanNumeral: RomanNumeral.get(Interval.get(intervalLit)).name,
+      chordVoicing: ['1P']
+    }));
+
+    this.beats.clear();
+    for (let beat of exerciseBeats) {
+      this.beats.push(this.fb.group({
+        chordRomanNumeral: [beat.chordRomanNumeral],
+        chordType: [beat.chordType],
+        chordVoicing: this.fb.array(beat.chordVoicing)
+      }));
+    }
+
+  }
 
   private loadFormWithExercise(exercise: Exercise): void {
     this.exerciseForm = this.fb.group({
@@ -127,17 +206,15 @@ export class ExerciseEditComponent implements OnInit{
         chordVoicing: this.fb.array(beat.chordVoicing)
       })))
     });
-    // this.exerciseForm = this.fb.group({
-    //   id: [exercise.id],
-    //   name: [exercise.name],
-    //   description: [exercise.description],
-    //   iterations: this.fb.array(exercise.iterations.map(iteration => this.fb.group({
-    //     noteLetter: [iteration.noteLetter],
-    //     accidental: [iteration.accidental],
-    //     enabled: [iteration.enabled]
-    //   }))),
-    //   sequence: this.fb.array(exercise.sequence.map(chord => this.fb.array(chord)))
-    // });
+  }
+
+  private initializeScaleGeneratorForm(): FormGroup {
+    return this.fb.group({
+      scaleType: ['major'],
+      pattern: ['linear'],
+      direction: ['descending'],
+      octaves: [2]
+    });
   }
 
   private generateNewExercise(): Exercise {
@@ -153,20 +230,5 @@ export class ExerciseEditComponent implements OnInit{
         }
       ]
     }
-    // return {
-    //   id: uuidv4(),
-    //   name: 'New Exercise Name',
-    //   description: 'New Exercise Description',
-    //   iterations: Object.values(NoteLetters).flatMap(letter => {
-    //     return Object.values(Accidentals).map(accidental => {
-    //       return {
-    //         noteLetter: letter,
-    //         accidental: accidental,
-    //         enabled: [Accidentals.Flat, Accidentals.Natural, Accidentals.Sharp].some(acc => acc === accidental)
-    //       }
-    //     })
-    //   }),
-    //   sequence: [[0]]
-    // }
   }
 }

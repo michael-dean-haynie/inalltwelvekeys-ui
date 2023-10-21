@@ -1,57 +1,73 @@
-<form *ngIf="modeIsCreate || modeIsUpdate" [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
-  <input formControlName="name" placeholder="Exercise Name">
-  <input formControlName="description" placeholder="Exercise Description">
-<!-- rework/remove iterations -->
-<!--  <div formArrayName="iterations">-->
-<!--    <div>Iterations (Keys)</div>-->
-<!--    <div *ngFor="let iteration of iterations.controls; index as i">-->
-<!--      <div formGroupName="{{i}}">-->
-<!--&lt;!&ndash;        <input formControlName="noteLetter" placeholder="B">&ndash;&gt;-->
-<!--&lt;!&ndash;        <input formControlName="accidental" placeholder="♭">&ndash;&gt;-->
-<!--        <span>{{iteration.get('noteLetter')?.value}}</span>-->
-<!--        <span>{{iteration.get('accidental')?.value}}</span>-->
-<!--        <input type="checkbox" formControlName="enabled">-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+<ng-container *ngIf="modeIsCreate || modeIsUpdate">
+  <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit()">
+    <input formControlName="name" placeholder="Exercise Name">
+    <input formControlName="description" placeholder="Exercise Description">
 
-  <!-- Beats -->
-  <div>
-    <div>Beats</div>
-    <div formArrayName="beats">
-      <div *ngFor="let beat of beats.controls; index as beatIdx">
-        <div formGroupName="{{beatIdx}}">
-          <div>Scale Degree of the Chord Root</div>
-          <input formControlName="chordRomanNumeral"/>
+    <!-- Beats -->
+    <div>
+      <div>Beats</div>
+      <ng-container formArrayName="beats">
+        <ul class="list-group">
+          <ng-container *ngFor="let beat of beats.controls; index as beatIdx">
+            <li class="list-group-item">
+              <ng-container formGroupName="{{beatIdx}}">
+                <div>Scale Degree of the Chord Root</div>
+                <input formControlName="chordRomanNumeral"/>
 
-          <div>Chord Type (Quality)</div>
-          <input formControlName="chordType"/>
+                <div>Chord Type (Quality)</div>
+                <input formControlName="chordType"/>
 
-          <div>Chord Voicing</div>
-          <div formArrayName="chordVoicing">
-            <div *ngFor="let interval of getVoicingByBeatIndex(beatIdx).controls; index as intervalIdx">
-              <input formControlName="{{intervalIdx}}"/>
-            </div>
-          </div>
-        </div>
-      </div>
+                <div>Chord Voicing</div>
+                <ng-container formArrayName="chordVoicing">
+                  <div *ngFor="let interval of getVoicingByBeatIndex(beatIdx).controls; index as intervalIdx">
+                    <input formControlName="{{intervalIdx}}"/>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </li>
+          </ng-container>
+        </ul>
+      </ng-container>
     </div>
-  </div>
 
-<!--  rework beats -->
-<!--  <div formArrayName="sequence">-->
-<!--    <div>Sequence (Chords)</div>-->
-<!--    <div *ngFor="let chord of sequence.controls; index as i">-->
-<!--      <span formArrayName="{{i}}">-->
-<!--        <span *ngFor="let member of getChord(i).controls; index as j">-->
-<!--          <input formControlName="{{j}}" placeholder="0">-->
-<!--        </span>-->
-<!--        <button type="button" (click)="addMemberToChord(i)">Add Chord Member</button>-->
-<!--      </span>-->
-<!--      <button type="button" (click)="deleteChord(i)">Delete Chord</button>-->
-<!--    </div>-->
-<!--    <button type="button" (click)="addChord()">Add Chord</button>-->
-<!--  </div>-->
+    <div>
+      <ng-container [formGroup]="scaleGeneratorForm">
+        <div class="mb-3">
+          <label for="scaleType" class="form-label">Scale</label>
+          <select formControlName="scaleType" id="scaleType" class="form-select">
+            <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">
+              <option [ngValue]="scaleType">{{scaleType}}</option>
+            </ng-container>
+          </select>
+        </div>
 
-  <button>{{modeIsCreate ? "Create" : "Update" }}</button>
-</form>
+        <div class="mb-3">
+          <label for="pattern" class="form-label">Pattern</label>
+          <select formControlName="pattern" id="pattern" class="form-select">
+            <ng-container *ngFor="let pattern of patternOptions; index as patternIdx">
+              <option [ngValue]="pattern">{{pattern}}</option>
+            </ng-container>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="direction" class="form-label">Direction</label>
+          <select formControlName="direction" id="direction" class="form-select">
+            <ng-container *ngFor="let direction of directionOptions; index as directionIdx">
+              <option [ngValue]="direction">{{direction}}</option>
+            </ng-container>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="octaves" class="form-label">Octaves</label>
+          <input type="number" min="1" max="4" class="form-control" id="octaves" formControlName="octaves">
+        </div>
+
+        <button (click)="generateScaleBeats()" type="button" class="btn btn-primary">Generate Scale</button>
+      </ng-container>
+    </div>
+
+    <button>{{modeIsCreate ? "Create" : "Update" }}</button>
+  </form>
+</ng-container>
