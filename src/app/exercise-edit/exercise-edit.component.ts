@@ -172,7 +172,13 @@ export class ExerciseEditComponent implements OnInit{
         });
 
         if (pattern.addApproach) {
-          const approachInterval = Interval.substract(beatIntervals[0], '2m');
+          let approachInterval = Interval.substract(beatIntervals[0], '2m');
+          if (!approachInterval) { throw new Error(); }
+          const intv = Interval.get(approachInterval);
+          if (!intv) { throw new Error(); }
+          if (intv.dir || 0 < 0) {
+            approachInterval = Interval.add(approachInterval, '8P');
+          }
           if (!approachInterval) { throw new Error(); }
           beatIntervals.unshift(approachInterval);
         }
