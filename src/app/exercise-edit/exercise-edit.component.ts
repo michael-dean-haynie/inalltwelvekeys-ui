@@ -171,7 +171,7 @@ export class ExerciseEditComponent implements OnInit{
           return scaleType.intervals[pStepIntervalIndex];
         });
 
-        if (pattern.addApproach) {
+        if (pattern.addApproach && !scaleStep.finalForDirection) {
           let approachInterval = Interval.substract(beatIntervals[0], '2m');
           if (!approachInterval) { throw new Error(); }
           const intv = Interval.get(approachInterval);
