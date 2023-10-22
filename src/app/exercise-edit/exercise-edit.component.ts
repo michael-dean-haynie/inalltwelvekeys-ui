@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ExerciseService} from "../exercise.service";
@@ -8,18 +8,22 @@ import {Interval, RomanNumeral, ScaleType} from "tonal";
 import {ScalePattern} from "../utilities/scale-pattern";
 import {ExerciseBeat} from "../models/api/exercise-beat";
 import {posModRes} from "../utilities/math-utilities";
+import {forkJoin, Subscription, take} from "rxjs";
 
 @Component({
   selector: 'app-exercise-edit',
   templateUrl: './exercise-edit.component.html',
   styleUrls: ['./exercise-edit.component.scss']
 })
-export class ExerciseEditComponent implements OnInit{
-  name = new FormControl('');
-  modeIsCreate = false;
-  modeIsUpdate = false;
+export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecked {
+  id: string | undefined | null;
+  origin: string | undefined | null;
+  readyToDisplay = false;
+  editMode: 'create' | 'update' = 'create';
   exerciseForm: FormGroup = this.fb.group({});
   scaleGeneratorForm: FormGroup = this.initializeScaleGeneratorForm();
+  subscriptions: Subscription[] = [];
+  afterViewCheckedTasks: Array<() => void> = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -51,13 +55,20 @@ export class ExerciseEditComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id && id.length) {
-        this.exerciseService.get(id).subscribe(exercise => {
+    // wait for both params and queryParams to resolve ...
+    this.subscriptions.push(forkJoin([
+      this.route.paramMap.pipe(take(1)),
+      this.route.queryParamMap.pipe(take(1))
+    ]).subscribe(([params, queryParams]) => {
+      this.origin = queryParams.get('origin');
+      this.id = params.get('id');
+
+      if (this.id && this.id.length) {
+        this.exerciseService.get(this.id).subscribe(exercise => {
           if (exercise) {
             this.loadFormWithExercise(exercise);
-            this.modeIsUpdate = true;
+            this.editMode = 'update';
+            this.readyToDisplay = true;
           }
           else {
             this.router.navigate(['/404'], { skipLocationChange: true});
@@ -66,9 +77,23 @@ export class ExerciseEditComponent implements OnInit{
       }
       else {
         this.loadFormWithExercise(this.generateNewExercise());
-        this.modeIsCreate = true;
+        this.editMode = 'create';
+        this.readyToDisplay = true;
       }
-    });
+    }));
+  }
+
+  ngOnDestroy(): void {
+    for (let subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
+  }
+
+  ngAfterViewChecked(): void {
+    while(this.afterViewCheckedTasks.length) {
+      const task = this.afterViewCheckedTasks.pop() as () => void;
+      task();
+    }
   }
 
   onSubmit(startExercise: boolean = false): void {
@@ -88,7 +113,7 @@ export class ExerciseEditComponent implements OnInit{
       })
     }
 
-    if (this.modeIsCreate) {
+    if (this.editMode === 'create') {
       this.exerciseService.create(exercise).subscribe(_ => {
         if (startExercise) {
           this.router.navigate(['/exercise', exercise.id]);
@@ -107,6 +132,52 @@ export class ExerciseEditComponent implements OnInit{
       });
     }
   }
+
+  onCancel(): void {
+    let returnTo: 'exercise' | 'exercises' = 'exercises';
+    if (this.origin && this.origin === 'exercise') {
+      returnTo = 'exercise';
+    }
+    switch (returnTo) {
+      case 'exercise':
+        this.router.navigate(['/exercise', this.id])
+        break;
+      case 'exercises':
+        this.router.navigate(['/exercises'])
+        break;
+    }
+  }
+
+  addBeat(): void {
+    this.beats.push(this.fb.group({
+      chordRomanNumeral: [''],
+      chordType: [''],
+      chordVoicing: this.fb.array([
+        ['']
+      ])
+    }));
+
+    const beatIndex = this.beats.controls.length - 1;
+    this.afterViewCheckedTasks.push(() => {
+      const button = document.querySelector(`[data-bs-target="#beatPanel-${beatIndex}"]`) as HTMLElement;
+      button.click();
+    });
+  }
+
+  removeBeat(beatIndex: number): void {
+    this.beats.removeAt(beatIndex);
+  }
+
+  addInterval(beatIndex: number): void {
+    const voicing = this.getVoicingByBeatIndex(beatIndex);
+    voicing.push(new FormControl(''));
+  }
+
+  removeInterval(beatIndex: number, intervalIndex: number): void {
+    const voicing = this.getVoicingByBeatIndex(beatIndex);
+    voicing.removeAt(intervalIndex);
+  }
+
 
   generateScaleBeats(): void {
     const selectedScaleTypeLit = this.scaleGeneratorForm.get('scaleType')?.value;
@@ -206,7 +277,18 @@ export class ExerciseEditComponent implements OnInit{
         chordVoicing: this.fb.array(beat.chordVoicing)
       }));
     }
+  }
 
+  formatBeat(beatIndex: number): {symbol: string, voicing: string} {
+    const beatFg: FormGroup = this.beats.at(beatIndex) as FormGroup;
+    const chordRomanNumeral = beatFg.value['chordRomanNumeral'] || '';
+    const chordType = beatFg.value['chordType'] || '';
+    const chordVoicing: string[] = beatFg.value['chordVoicing'];
+
+    return {
+      symbol: `${chordRomanNumeral || ''}${chordType || ''}`,
+      voicing: `(${chordVoicing.join(' - ')})`
+    }
   }
 
   private loadFormWithExercise(exercise: Exercise): void {
@@ -226,7 +308,7 @@ export class ExerciseEditComponent implements OnInit{
     return this.fb.group({
       scaleType: ['major'],
       pattern: ['linear'],
-      direction: ['descending'],
+      direction: ['ascending then descending'],
       octaves: [2]
     });
   }
@@ -237,11 +319,11 @@ export class ExerciseEditComponent implements OnInit{
       name: 'New Exercise Name',
       description: 'New Exercise Description',
       beats: [
-        {
-          chordRomanNumeral: 'II',
-          chordType: 'm9',
-          chordVoicing: ['3m', '5P', '7m', '9M']
-        }
+        // {
+        //   chordRomanNumeral: 'II',
+        //   chordType: 'm9',
+        //   chordVoicing: ['3m', '5P', '7m', '9M']
+        // }
       ]
     }
   }

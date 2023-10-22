@@ -1,0 +1,22 @@
+.split-heading {
+  display: flex;
+  justify-content: space-between;
+
+  // vertical alignment between h2 and button
+  * {
+    margin: 0;
+    //line-height: unset;
+  }
+}
+
+.sticky-bottom-contents {
+  display: flex;
+  justify-content: space-between;
+  //border-top: 2px solid var(--bs-border-color);
+  //background-color: var(--bs-secondary-bg);
+}
+
+.beat-buttons {
+  display:flex;
+  justify-content: space-between;
+}

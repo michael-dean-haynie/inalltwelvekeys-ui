@@ -2,11 +2,13 @@
   <a routerLink="/exercise/{{exercise.id}}">
     <button>Start</button>
   </a>
-  <a routerLink="/exercise/edit/{{exercise.id}}">
+  <a routerLink="/exercise/edit/{{exercise.id}}" [queryParams]="{origin: 'exercises'}">
     <button>Edit</button>
   </a>
   <span>{{exercise.name}}</span>
 </div>
 <div>
-  <a routerLink="/exercise/edit"><button>Create New Exercise</button></a>
+  <a routerLink="/exercise/edit" [queryParams]="{origin: 'exercises'}">
+    <button>Create New Exercise</button>
+  </a>
 </div>

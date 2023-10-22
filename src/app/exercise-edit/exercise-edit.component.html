@@ -1,85 +1,169 @@
-<ng-container *ngIf="modeIsCreate || modeIsUpdate">
+<ng-container *ngIf="readyToDisplay">
   <form [formGroup]="exerciseForm" (ngSubmit)="onSubmit(true)">
-    <input formControlName="name" placeholder="Exercise Name">
-    <input formControlName="description" placeholder="Exercise Description">
+    <h1 class="mb-3">{{editMode === 'create' ? 'Create' : 'Edit'}} Exercise</h1>
+
+    <!-- Exercise Name -->
+    <div class="form-floating mb-3">
+      <input id="exerciseNameInput" formControlName="name" class="form-control" placeholder="Exercise Name">
+      <label for="exerciseNameInput">Exercise Name</label>
+    </div>
+
+    <!-- Exercise Description -->
+    <div class="form-floating mb-3">
+      <input id="exerciseDescriptionInput" formControlName="description" class="form-control" placeholder="Exercise Description">
+      <label for="exerciseDescriptionInput">Exercise Description</label>
+    </div>
 
     <!-- Beats -->
-    <div>
-      <div>Beats</div>
+    <div class="split-heading mb-3">
+      <h2>Beats</h2>
+
+      <!-- Button trigger scale generator modal -->
+      <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#scaleGeneratorModal">
+        Generate Scale
+      </button>
+    </div>
+
+    <!-- Scale Generator Modal -->
+    <div class="modal fade" id="scaleGeneratorModal" tabindex="-1" aria-labelledby="scaleGeneratorModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h3 class="modal-title fs-5" id="scaleGeneratorModalLabel">Generate a Scale</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <form [formGroup]="scaleGeneratorForm">
+
+              <div class="form-floating mb-3">
+                <select formControlName="scaleType" id="scaleType" class="form-select">
+                  <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">
+                    <option [ngValue]="scaleType">{{scaleType}}</option>
+                  </ng-container>
+                </select>
+                <label for="scaleType" class="form-label">Scale</label>
+                <!-- Needs a custom control value accessor -->
+                <!--          <label for="scaleTypeInput" class="form-label">Scale: {{scaleGeneratorForm.get('scaleType')?.value}}</label>-->
+                <!--          <input class="form-control" list="scaleTypeOptions" id="scaleTypeInput" placeholder="Type to search...">-->
+                <!--          <datalist id="scaleTypeOptions" formControlName="scaleType">-->
+                <!--            <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">-->
+                <!--              <option [ngValue]="scaleType">{{scaleType}}</option>-->
+                <!--              </ng-container>-->
+                <!--          </datalist>-->
+              </div>
+
+              <div class="form-floating mb-3">
+                <select formControlName="pattern" id="pattern" class="form-select">
+                  <ng-container *ngFor="let pattern of patternOptions; index as patternIdx">
+                    <option [ngValue]="pattern">{{pattern}}</option>
+                  </ng-container>
+                </select>
+                <label for="pattern" class="form-label">Pattern</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <select formControlName="direction" id="direction" class="form-select">
+                  <ng-container *ngFor="let direction of directionOptions; index as directionIdx">
+                    <option [ngValue]="direction">{{direction}}</option>
+                  </ng-container>
+                </select>
+                <label for="direction" class="form-label">Direction</label>
+              </div>
+
+              <div class="mb-3">
+                <label for="octaves" class="form-label">Octaves: {{scaleGeneratorForm.get('octaves')?.value}}</label>
+                <input formControlName="octaves" type="range" class="form-range" min="1" max="5" step="1" id="octaves">
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="generateScaleBeats()">
+              Generate Scale
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!beats.controls.length">
+      <div class="alert alert-info" role="alert">
+        This exercise doesn't have any beats yet.
+      </div>
+    </ng-container>
+
+    <!-- Beats Accordion -->
+    <div class="accordion mb-3" id="beatsAccordion">
       <ng-container formArrayName="beats">
-        <ul class="list-group">
-          <ng-container *ngFor="let beat of beats.controls; index as beatIdx">
-            <li class="list-group-item">
-              <ng-container formGroupName="{{beatIdx}}">
-                <div>Scale Degree of the Chord Root</div>
-                <input formControlName="chordRomanNumeral"/>
+        <ng-container *ngFor="let beat of beats.controls; index as beatIdx">
+          <div class="accordion-item">
 
-                <div>Chord Type (Quality)</div>
-                <input formControlName="chordType"/>
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" attr.data-bs-target="#beatPanel-{{beatIdx}}" aria-expanded="false" attr.aria-controls="beatPanel-{{beatIdx}}">
+                <strong>{{formatBeat(beatIdx).symbol}}</strong>
+                &nbsp;
+                <small>{{formatBeat(beatIdx).voicing}}</small>
+              </button>
+            </h2>
 
-                <div>Chord Voicing</div>
-                <ng-container formArrayName="chordVoicing">
-                  <div *ngFor="let interval of getVoicingByBeatIndex(beatIdx).controls; index as intervalIdx">
-                    <input formControlName="{{intervalIdx}}"/>
+            <div id="beatPanel-{{beatIdx}}" class="accordion-collapse collapse">
+              <div class="accordion-body">
+                <ng-container formGroupName="{{beatIdx}}">
+                  <div class="form-floating mb-3">
+                    <input id="chordRomanNumeralInput-beat{{beatIdx}}" formControlName="chordRomanNumeral" class="form-control" placeholder="Scale Degree">
+                    <label for="chordRomanNumeralInput-beat{{beatIdx}}">Scale Degree</label>
                   </div>
+
+                  <div class="form-floating mb-3">
+                    <input id="chordTypeInput-beat{{beatIdx}}" formControlName="chordType" class="form-control" placeholder="Chord Quality">
+                    <label for="chordTypeInput-beat{{beatIdx}}">Chord Quality</label>
+                  </div>
+
+                  <h5>Chord Voicing</h5>
+                  <ng-container formArrayName="chordVoicing">
+                    <div *ngFor="let interval of getVoicingByBeatIndex(beatIdx).controls; index as intervalIdx">
+                      <div class="input-group mb-3">
+                        <input id="chordVoicingInput-beat{{beatIdx}}-voice{{intervalIdx}}" formControlName="{{intervalIdx}}" class="form-control" placeholder="Voice">
+                        <button class="btn btn-outline-danger" type="button" (click)="removeInterval(beatIdx, intervalIdx)">Remove</button>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="!getVoicingByBeatIndex(beatIdx).controls.length">
+                    <div class="alert alert-info" role="alert">
+                      This beat doesn't have any voices yet.
+                    </div>
+                  </ng-container>
+
+                  <div class="beat-buttons">
+                    <button type="button" class="btn btn-outline-danger" (click)="removeBeat(beatIdx)">
+                      Remove Beat
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" (click)="addInterval(beatIdx)">
+                      Add Voice
+                    </button>
+                  </div>
+
                 </ng-container>
-              </ng-container>
-            </li>
-          </ng-container>
-        </ul>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
       </ng-container>
     </div>
 
-    <div>
-      <ng-container [formGroup]="scaleGeneratorForm">
-        <div class="mb-3">
-<!--          <label for="scaleType" class="form-label">Scale</label>-->
-<!--          <select formControlName="scaleType" id="scaleType" class="form-select">-->
-<!--            <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">-->
-<!--              <option [ngValue]="scaleType">{{scaleType}}</option>-->
-<!--            </ng-container>-->
-<!--          </select>-->
-          <label for="scaleTypeInput" class="form-label">Scale: {{scaleGeneratorForm.get('scaleType')?.value}}</label>
-          <input class="form-control" list="scaleTypeOptions" id="scaleTypeInput" placeholder="Type to search...">
-          <datalist id="scaleTypeOptions" formControlName="scaleType">
-            <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">
-              <option [ngValue]="scaleType">{{scaleType}}</option>
-<!--            <option value="San Francisco">-->
-<!--            <option value="New York">-->
-<!--            <option value="Seattle">-->
-<!--            <option value="Los Angeles">-->
-<!--            <option value="Chicago">-->
-              </ng-container>
-          </datalist>
-        </div>
+    <button type="button" class="btn btn-outline-primary mb-3" (click)="addBeat()">
+      Add Beat
+    </button>
 
-        <div class="mb-3">
-          <label for="pattern" class="form-label">Pattern</label>
-          <select formControlName="pattern" id="pattern" class="form-select">
-            <ng-container *ngFor="let pattern of patternOptions; index as patternIdx">
-              <option [ngValue]="pattern">{{pattern}}</option>
-            </ng-container>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label for="direction" class="form-label">Direction</label>
-          <select formControlName="direction" id="direction" class="form-select">
-            <ng-container *ngFor="let direction of directionOptions; index as directionIdx">
-              <option [ngValue]="direction">{{direction}}</option>
-            </ng-container>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label for="octaves" class="form-label">Octaves: {{scaleGeneratorForm.get('octaves')?.value}}</label>
-          <input formControlName="octaves" type="range" class="form-range" min="1" max="5" step="1" id="octaves">
-        </div>
-
-        <button (click)="generateScaleBeats()" type="button" class="btn btn-primary">Generate Scale</button>
-      </ng-container>
+    <div class="sticky-bottom">
+      <div class="sticky-bottom-contents py-3 bg-body border-top">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+        <button class="btn btn-primary">{{editMode === 'create' ? "Create" : "Update" }} and Start Exercise</button>
+      </div>
     </div>
-
-    <button class="btn btn-primary">{{modeIsCreate ? "Create" : "Update" }} and Start Exercise</button>
   </form>
 </ng-container>
