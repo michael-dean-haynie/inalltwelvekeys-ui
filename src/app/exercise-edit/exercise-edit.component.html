@@ -33,12 +33,24 @@
     <div>
       <ng-container [formGroup]="scaleGeneratorForm">
         <div class="mb-3">
-          <label for="scaleType" class="form-label">Scale</label>
-          <select formControlName="scaleType" id="scaleType" class="form-select">
+<!--          <label for="scaleType" class="form-label">Scale</label>-->
+<!--          <select formControlName="scaleType" id="scaleType" class="form-select">-->
+<!--            <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">-->
+<!--              <option [ngValue]="scaleType">{{scaleType}}</option>-->
+<!--            </ng-container>-->
+<!--          </select>-->
+          <label for="scaleTypeInput" class="form-label">Scale: {{scaleGeneratorForm.get('scaleType')?.value}}</label>
+          <input class="form-control" list="scaleTypeOptions" id="scaleTypeInput" placeholder="Type to search...">
+          <datalist id="scaleTypeOptions" formControlName="scaleType">
             <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">
               <option [ngValue]="scaleType">{{scaleType}}</option>
-            </ng-container>
-          </select>
+<!--            <option value="San Francisco">-->
+<!--            <option value="New York">-->
+<!--            <option value="Seattle">-->
+<!--            <option value="Los Angeles">-->
+<!--            <option value="Chicago">-->
+              </ng-container>
+          </datalist>
         </div>
 
         <div class="mb-3">
