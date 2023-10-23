@@ -23,6 +23,7 @@ export class ExerciseComponent implements OnInit, OnDestroy{
   complete: boolean = false;
   private _exercise: Exercise | undefined;
   private subscriptions: Subscription[] = [];
+  private notesNeedingRelease: number[] = []; // notes that need to be replayed before they can match again
 
   constructor(
     private route: ActivatedRoute,
@@ -87,6 +88,11 @@ export class ExerciseComponent implements OnInit, OnDestroy{
   }
 
   private handleActiveNotesChanges(activeNotes: number[]) {
+    // update notesNeedingRelease
+    this.notesNeedingRelease = this.notesNeedingRelease.filter(note => activeNotes.includes(note));
+    // only continue with active notes that do not need release
+    activeNotes = activeNotes.filter(note => !this.notesNeedingRelease.includes(note));
+
     if (this.exercise.beats.length) {
       let activeNotesMatchCurrentBeat = false;
 
@@ -118,6 +124,13 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       }
 
       if (activeNotesMatchCurrentBeat) {
+        // update notes needing releas
+        for (let note of activeNotes) {
+          if (!this.notesNeedingRelease.includes(note)) {
+            this.notesNeedingRelease.push(note);
+          }
+        }
+
         this.progress();
       }
     }
