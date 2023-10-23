@@ -96,7 +96,7 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     // only continue with active notes that do not need release
     activeNotes = activeNotes.filter(note => {
       const activeNoteChroma = Note.get(Note.fromMidi(note)).chroma;
-      if (!activeNoteChroma) { throw new Error(); }
+      if (activeNoteChroma === undefined) { throw new Error(); }
       return !this.chromasNeedingRelease.includes(activeNoteChroma);
     });
 
@@ -134,7 +134,7 @@ export class ExerciseComponent implements OnInit, OnDestroy{
         // update notes needing release
         for (let note of activeNotes) {
           const activeNoteChroma = Note.get(Note.fromMidi(note)).chroma;
-          if (!activeNoteChroma) { throw new Error(); }
+          if (activeNoteChroma === undefined) { throw new Error(); }
           if (!this.chromasNeedingRelease.includes(activeNoteChroma)) {
             this.chromasNeedingRelease.push(activeNoteChroma);
           }
