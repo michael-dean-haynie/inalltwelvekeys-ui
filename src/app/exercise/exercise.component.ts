@@ -23,7 +23,8 @@ export class ExerciseComponent implements OnInit, OnDestroy{
   complete: boolean = false;
   private _exercise: Exercise | undefined;
   private subscriptions: Subscription[] = [];
-  private notesNeedingRelease: number[] = []; // notes that need to be replayed before they can match again
+  // notes (pitch classes) that need to be released before they can match again
+  private chromasNeedingRelease: number[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -88,10 +89,16 @@ export class ExerciseComponent implements OnInit, OnDestroy{
   }
 
   private handleActiveNotesChanges(activeNotes: number[]) {
-    // update notesNeedingRelease
-    this.notesNeedingRelease = this.notesNeedingRelease.filter(note => activeNotes.includes(note));
+    this.chromasNeedingRelease = this.chromasNeedingRelease.filter(chroma => {
+      return activeNotes.map(note => Note.get(Note.fromMidi(note)).chroma)
+        .includes(chroma);
+    });
     // only continue with active notes that do not need release
-    activeNotes = activeNotes.filter(note => !this.notesNeedingRelease.includes(note));
+    activeNotes = activeNotes.filter(note => {
+      const activeNoteChroma = Note.get(Note.fromMidi(note)).chroma;
+      if (!activeNoteChroma) { throw new Error(); }
+      return !this.chromasNeedingRelease.includes(activeNoteChroma);
+    });
 
     if (this.exercise.beats.length) {
       let activeNotesMatchCurrentBeat = false;
@@ -124,10 +131,12 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       }
 
       if (activeNotesMatchCurrentBeat) {
-        // update notes needing releas
+        // update notes needing release
         for (let note of activeNotes) {
-          if (!this.notesNeedingRelease.includes(note)) {
-            this.notesNeedingRelease.push(note);
+          const activeNoteChroma = Note.get(Note.fromMidi(note)).chroma;
+          if (!activeNoteChroma) { throw new Error(); }
+          if (!this.chromasNeedingRelease.includes(activeNoteChroma)) {
+            this.chromasNeedingRelease.push(activeNoteChroma);
           }
         }
 
