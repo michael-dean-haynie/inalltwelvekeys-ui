@@ -51,6 +51,16 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     return this.exercise.beats[this.beatIndex];
   }
 
+  get currentKeyProgressWidth(): string {
+    const percentage = Math.floor((this.beatIndex / this.exercise.beats.length) * 100);
+    return `${percentage}%`;
+  }
+
+  get exerciseProgressWidth(): string {
+    const percentage = Math.floor((this.keyIndex / this.keys.length) * 100);
+    return `${percentage}%`;
+  }
+
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -186,6 +196,7 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       while(this.keyIndex === initialKeyIndex) {
         this.regress();
       }
+      this.beatIndex = 0;
     }
   }
 

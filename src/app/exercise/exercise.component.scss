@@ -1,0 +1,35 @@
+.sticky-bottom-contents {
+  display: flex;
+  justify-content: space-between;
+}
+
+.key-container {
+  display: grid;
+  grid-template-columns: 5rem 1fr 5rem;
+  gap: 1.5rem;
+
+  .key-container-button {
+    justify-self: stretch;
+    align-self: stretch;
+
+    .bi {
+      font-size: 2rem;
+    }
+  }
+}
+
+.key-display {
+  font-size: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.complete-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  gap: 1.5rem;
+
+}
