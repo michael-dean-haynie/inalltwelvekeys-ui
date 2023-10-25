@@ -1,20 +1,24 @@
-<ul class="list-group">
+<ul class="list-group exercise-list mb-3">
   <ng-container *ngFor="let exercise of exercises; index as i">
     <li class="list-group-item">
-      <span>{{exercise.name}}</span>
+      <div class="flex-container">
+        <span>{{exercise.name}}</span>
 
-      <a routerLink="/exercise/{{exercise.id}}">
-        <button type="button" class="btn btn-primary">Start</button>
-      </a>
+        <a routerLink="/exercise/{{exercise.id}}" class="stretched-link">
+          <button type="button" class="btn btn-primary">Start</button>
+        </a>
+        <!--      <a routerLink="/exercise/edit/{{exercise.id}}" [queryParams]="{origin: 'exercises'}">-->
+        <!--        <button type="button" class="btn btn-secondary">Edit</button>-->
+        <!--      </a>-->
+      </div>
 
-      <a routerLink="/exercise/edit/{{exercise.id}}" [queryParams]="{origin: 'exercises'}">
-        <button type="button" class="btn btn-secondary">Edit</button>
-      </a>
     </li>
   </ng-container>
 </ul>
-<div>
-  <a routerLink="/exercise/edit" [queryParams]="{origin: 'exercises'}">
-    <button type="button" class="btn btn-success">Create New Exercise</button>
-  </a>
+<div class="sticky-bottom">
+  <div class="sticky-bottom-contents py-3 bg-body border-top">
+    <a routerLink="/exercise/edit" [queryParams]="{origin: 'exercises'}">
+      <button type="button" class="btn btn-success">Create New Exercise</button>
+    </a>
+  </div>
 </div>

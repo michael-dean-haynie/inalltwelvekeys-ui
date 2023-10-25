@@ -138,11 +138,11 @@
                   </ng-container>
 
                   <div class="beat-buttons">
+                    <button type="button" class="btn btn-outline-success" (click)="addInterval(beatIdx)">
+                      Add Voice
+                    </button>
                     <button type="button" class="btn btn-outline-danger" (click)="removeBeat(beatIdx)">
                       Remove Beat
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" (click)="addInterval(beatIdx)">
-                      Add Voice
                     </button>
                   </div>
 
@@ -155,7 +155,7 @@
       </ng-container>
     </div>
 
-    <button type="button" class="btn btn-outline-primary mb-3" (click)="addBeat()">
+    <button type="button" class="btn btn-outline-success mb-3" (click)="addBeat()">
       Add Beat
     </button>
 

@@ -4,11 +4,12 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {ExerciseService} from "../exercise.service";
 import {Exercise} from "../models/api/exercise";
 import { v4 as uuidv4 } from "uuid";
-import {Interval, RomanNumeral, ScaleType} from "tonal";
+import {Interval, RomanNumeral, ScaleType, Tonal} from "tonal";
 import {ScalePattern} from "../utilities/scale-pattern";
 import {ExerciseBeat} from "../models/api/exercise-beat";
 import {posModRes} from "../utilities/math-utilities";
 import {forkJoin, Subscription, take} from "rxjs";
+import {ScaleGeneratorService} from "../scale-generator.service";
 
 @Component({
   selector: 'app-exercise-edit',
@@ -21,14 +22,15 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   readyToDisplay = false;
   editMode: 'create' | 'update' = 'create';
   exerciseForm: FormGroup = this.fb.group({});
-  scaleGeneratorForm: FormGroup = this.initializeScaleGeneratorForm();
   subscriptions: Subscription[] = [];
+  scaleGeneratorForm: FormGroup = this.initializeScaleGeneratorForm();
   afterViewCheckedTasks: Array<() => void> = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private exerciseService: ExerciseService,
+    private scaleGeneratorService: ScaleGeneratorService,
     private fb: FormBuilder
   ) {}
 
@@ -55,6 +57,7 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   ngOnInit(): void {
+    console.log();
     // wait for both params and queryParams to resolve ...
     this.subscriptions.push(forkJoin([
       this.route.paramMap.pipe(take(1)),
@@ -305,12 +308,21 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   private initializeScaleGeneratorForm(): FormGroup {
-    return this.fb.group({
-      scaleType: ['major'],
-      pattern: ['linear'],
-      direction: ['ascending then descending'],
-      octaves: [2]
+    const sg = this.scaleGeneratorService.scaleGenerator;
+    const sgfg = this.fb.group({
+      scaleType: [sg.scaleType],
+      pattern: [sg.pattern],
+      direction: [sg.direction],
+      octaves: [sg.octaves]
     });
+
+    this.subscriptions.push(sgfg.valueChanges.subscribe(value => {
+      const { scaleType, pattern, direction, octaves } = value;
+      if (!scaleType || !pattern || !direction || !octaves) { throw new Error(); }
+      this.scaleGeneratorService.scaleGenerator = { scaleType, pattern, direction, octaves };
+    }));
+
+    return sgfg;
   }
 
   private generateNewExercise(): Exercise {
