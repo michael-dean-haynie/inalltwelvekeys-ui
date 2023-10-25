@@ -24,7 +24,10 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   exerciseForm: FormGroup = this.fb.group({});
   subscriptions: Subscription[] = [];
   scaleGeneratorForm: FormGroup = this.initializeScaleGeneratorForm();
+  voicingGeneratorForm: FormGroup = this.initializeVoicingGeneratorForm();
   afterViewCheckedTasks: Array<() => void> = [];
+
+  _voicingGeneratorBeatIndex: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -192,6 +195,8 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
     const direction = this.scaleGeneratorForm.get('direction')?.value;
     const octaves = this.scaleGeneratorForm.get('octaves')?.value;
 
+    const repeatTonicOnReverseDirection: boolean = pattern?.name !== 'linear';
+
     let scaleSteps: { interval: string, direction: 'ascending' | 'descending', finalForDirection: boolean }[] = []
     switch (direction) {
       case 'ascending':
@@ -216,7 +221,9 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
             .map(interval => ({ interval, direction: 'ascending', finalForDirection: false })))
         }
         scaleSteps.push({ interval: '1P', direction: 'ascending', finalForDirection: true })
-        scaleSteps.push({ interval: '1P', direction: 'descending', finalForDirection: false });
+        if (repeatTonicOnReverseDirection) {
+          scaleSteps.push({ interval: '1P', direction: 'descending', finalForDirection: false });
+        }
         for (let i = 0; i < octaves; i++) {
           scaleSteps = scaleSteps.concat([...scaleType.intervals]
             .reverse()
@@ -231,7 +238,9 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
             .reverse()
             .map(interval => ({ interval, direction: 'descending', finalForDirection: false })))
         }
-        scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        if (repeatTonicOnReverseDirection) {
+          scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        }
         for (let i = 0; i < octaves; i++) {
           scaleSteps = scaleSteps.concat([...scaleType.intervals]
             .map(interval => ({ interval, direction: 'ascending', finalForDirection: false })))
@@ -282,6 +291,14 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
     }
   }
 
+  generateVoicing(): void {
+    console.log(this._voicingGeneratorBeatIndex);
+  }
+
+  contextualizeVoicingGeneratorForm(beatIndex: number): void {
+    this._voicingGeneratorBeatIndex = beatIndex;
+  }
+
   formatBeat(beatIndex: number): {symbol: string, voicing: string} {
     const beatFg: FormGroup = this.beats.at(beatIndex) as FormGroup;
     const chordRomanNumeral = beatFg.value['chordRomanNumeral'] || '';
@@ -323,6 +340,11 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
     }));
 
     return sgfg;
+  }
+  private initializeVoicingGeneratorForm(): FormGroup {
+    return this.fb.group({
+      voicing: [''],
+    });
   }
 
   private generateNewExercise(): Exercise {
