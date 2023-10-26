@@ -75,13 +75,6 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   ngOnInit(): void {
-    // TODO remove testing
-    const chordTypeNames = VoicingGenerator.chordTypeNames();
-    console.log('chordTypeNames: ', chordTypeNames);
-    for (let chordTypeName of chordTypeNames) {
-      console.log(chordTypeName);
-      console.log(VoicingGenerator.forChord(chordTypeName));
-    }
     // wait for both params and queryParams to resolve ...
     this.subscriptions.push(forkJoin([
       this.route.paramMap.pipe(take(1)),

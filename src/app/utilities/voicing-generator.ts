@@ -1,4 +1,4 @@
-import {ChordType} from "tonal";
+import {ChordType, Interval} from "tonal";
 
 export interface Voicing {
   name: string;
@@ -70,7 +70,7 @@ function getInversionVoicings(intervals: string[]): Voicing[] {
     const name = i > 0 ? `${addSuffix(i)} inversion` : 'root position';
     result.push({
       name,
-      intervals: rotateArray(intervals, i)
+      intervals: arrangeIntervals(rotateArray(intervals, i))
     });
   }
 
@@ -104,4 +104,27 @@ function rotateArray<T>(theArray: T[], times: number = 1): T[] {
     }
   }
   return theArray;
+}
+
+function arrangeIntervals(intervals: string[]): string[] {
+  let lastIntervalHalfSteps = 0;
+  let addOctaves = 0;
+  for (let i = 0; i < intervals.length; i++) {
+    const simpleInterval = Interval.simplify(intervals[i]);
+    intervals[i] = simpleInterval;
+
+    const thisIntervalHalfSteps = Interval.get(simpleInterval).semitones;
+    if (thisIntervalHalfSteps === undefined ) { throw new Error(); }
+    if (thisIntervalHalfSteps < lastIntervalHalfSteps) {
+      addOctaves++;
+    }
+    lastIntervalHalfSteps = thisIntervalHalfSteps;
+
+    for(let o = 0; o < addOctaves; o++) {
+      const intervalSum = Interval.add(intervals[i], '8P');
+      if (!intervalSum) { throw new Error(); }
+      intervals[i] = intervalSum;
+    }
+  }
+  return intervals;
 }
