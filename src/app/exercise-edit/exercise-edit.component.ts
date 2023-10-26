@@ -10,6 +10,7 @@ import {ExerciseBeat} from "../models/api/exercise-beat";
 import {posModRes} from "../utilities/math-utilities";
 import {forkJoin, Subscription, take} from "rxjs";
 import {ScaleGeneratorService} from "../scale-generator.service";
+import {VoicingGenerator} from "../utilities/voicing-generator";
 
 @Component({
   selector: 'app-exercise-edit',
@@ -55,12 +56,32 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
     return [...ScalePattern.directions()];
   }
 
+  get voicingGeneratorChordTypeOptions(): string[] {
+    return [...VoicingGenerator.chordTypeNames()];
+  }
+
+  get voicingNameOptions(): string[] {
+    const result: string[] = [];
+    const chordType = this.voicingGeneratorForm.get('chordType')?.value;
+    if(chordType) {
+      const voicingNames = VoicingGenerator.forChord(chordType).map(voicing => voicing.name);
+      result.push(...voicingNames);
+    }
+    return result;
+  }
+
   getVoicingByBeatIndex(beatIdx: number): FormArray {
     return this.beats.controls[beatIdx].get('chordVoicing') as FormArray;
   }
 
   ngOnInit(): void {
-    console.log();
+    // TODO remove testing
+    const chordTypeNames = VoicingGenerator.chordTypeNames();
+    console.log('chordTypeNames: ', chordTypeNames);
+    for (let chordTypeName of chordTypeNames) {
+      console.log(chordTypeName);
+      console.log(VoicingGenerator.forChord(chordTypeName));
+    }
     // wait for both params and queryParams to resolve ...
     this.subscriptions.push(forkJoin([
       this.route.paramMap.pipe(take(1)),
@@ -156,10 +177,12 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
 
   addBeat(): void {
     this.beats.push(this.fb.group({
-      chordRomanNumeral: [''],
-      chordType: [''],
+      chordRomanNumeral: ['I'],
+      chordType: ['maj'],
       chordVoicing: this.fb.array([
-        ['']
+        ['1P'],
+        ['3M'],
+        ['5P']
       ])
     }));
 
@@ -292,11 +315,39 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   generateVoicing(): void {
-    console.log(this._voicingGeneratorBeatIndex);
+    const beat = this.beats.at(this._voicingGeneratorBeatIndex);
+    if (beat) {
+      const beatVoicing = beat.get('chordVoicing') as FormArray;
+      if (beatVoicing) {
+        const chordType = this.voicingGeneratorForm.get('chordType')?.value;
+        const beatChordTypeCtrl = beat.get('chordType');
+        if (beatChordTypeCtrl) {
+          beatChordTypeCtrl.setValue(chordType);
+        }
+        if (chordType) {
+          const voicings = VoicingGenerator.forChord(chordType);
+          if (voicings) {
+            const voicingName = this.voicingGeneratorForm.get('voicingName')?.value;
+            if (voicingName) {
+              const voicing = voicings.find(vcng => vcng.name === voicingName);
+              if (voicing) {
+                beatVoicing.clear();
+                for (let interval of voicing.intervals) {
+                  beatVoicing.push(new FormControl(interval));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   contextualizeVoicingGeneratorForm(beatIndex: number): void {
     this._voicingGeneratorBeatIndex = beatIndex;
+    const beat = this.beats.at(beatIndex);
+    const chordType = beat.get('chordType')?.value;
+    this.voicingGeneratorForm.get('chordType')?.setValue(chordType || 'maj');
   }
 
   formatBeat(beatIndex: number): {symbol: string, voicing: string} {
@@ -342,16 +393,29 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
     return sgfg;
   }
   private initializeVoicingGeneratorForm(): FormGroup {
-    return this.fb.group({
-      voicing: [''],
+    const fg =  this.fb.group({
+      chordType: ['maj'],
+      voicingName: ['']
     });
+
+    const chordTypeCtrl = fg.get('chordType');
+    if (chordTypeCtrl){
+      this.subscriptions.push(chordTypeCtrl.valueChanges.subscribe(value => {
+        const voicingName = fg.get('voicingName')?.value || '';
+        if (!this.voicingNameOptions.includes(voicingName)) {
+          fg.get('voicingName')?.setValue(this.voicingNameOptions[0]);
+        }
+      }));
+    }
+
+    return fg;
   }
 
   private generateNewExercise(): Exercise {
     return {
       id: uuidv4(),
-      name: 'New Exercise Name',
-      description: 'New Exercise Description',
+      name: 'New Exercise',
+      description: '',
       beats: [
         // {
         //   chordRomanNumeral: 'II',

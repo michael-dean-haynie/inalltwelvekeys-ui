@@ -102,14 +102,23 @@
           <div class="modal-body">
             <form [formGroup]="voicingGeneratorForm">
 
-<!--              <div class="form-floating mb-3">-->
-<!--                <select formControlName="scaleType" id="scaleType" class="form-select">-->
-<!--                  <ng-container *ngFor="let scaleType of scaleTypeOptions; index as scaleTypeIdx">-->
-<!--                    <option [ngValue]="scaleType">{{scaleType}}</option>-->
-<!--                  </ng-container>-->
-<!--                </select>-->
-<!--                <label for="scaleType" class="form-label">Scale</label>-->
-<!--              </div>-->
+              <div class="form-floating mb-3">
+                <select formControlName="chordType" id="chordType" class="form-select">
+                  <ng-container *ngFor="let chordType of voicingGeneratorChordTypeOptions; index as chordTypeIdx">
+                    <option [ngValue]="chordType">{{chordType}}</option>
+                  </ng-container>
+                </select>
+                <label for="chordType" class="form-label">Chord Type</label>
+              </div>
+
+              <div class="form-floating mb-3">
+                <select formControlName="voicingName" id="voicingName" class="form-select">
+                  <ng-container *ngFor="let voicingName of voicingNameOptions; index as voicingNameIdx">
+                    <option [ngValue]="voicingName">{{voicingName}}</option>
+                  </ng-container>
+                </select>
+                <label for="voicingName" class="form-label">Voicing Name</label>
+              </div>
 
 <!--              <div class="form-floating mb-3">-->
 <!--                <select formControlName="pattern" id="pattern" class="form-select">-->
@@ -175,17 +184,17 @@
                   </div>
 
                   <div class="form-floating mb-3">
-                    <input id="chordTypeInput-beat{{beatIdx}}" formControlName="chordType" class="form-control" placeholder="Chord Quality">
-                    <label for="chordTypeInput-beat{{beatIdx}}">Chord Quality</label>
+                    <input id="chordTypeInput-beat{{beatIdx}}" formControlName="chordType" class="form-control" placeholder="Chord Type">
+                    <label for="chordTypeInput-beat{{beatIdx}}">Chord Type</label>
                   </div>
 
                   <div class="split-heading mb-3">
                     <h5>Chord Voicing</h5>
 
                     <!-- Button trigger voicing generator modal -->
-<!--                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#voicingGeneratorModal" (click)="contextualizeVoicingGeneratorForm(beatIdx)">-->
-<!--                      Generate Voicing-->
-<!--                    </button>-->
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#voicingGeneratorModal" (click)="contextualizeVoicingGeneratorForm(beatIdx)">
+                      Generate Voicing
+                    </button>
                   </div>
                   <ng-container formArrayName="chordVoicing">
                     <div *ngFor="let interval of getVoicingByBeatIndex(beatIdx).controls; index as intervalIdx">

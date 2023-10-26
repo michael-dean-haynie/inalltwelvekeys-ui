@@ -1,0 +1,107 @@
+import {ChordType} from "tonal";
+
+export interface Voicing {
+  name: string;
+  intervals: string[];
+}
+
+const voicings: { [key: string]: Voicing[] } = {
+  // triads
+  'maj': [],
+  'min': [],
+  'dim': [],
+  'aug': [],
+
+  // 7th chords
+  'm7': [],
+  'maj7': [],
+  '7': [],
+
+  // 9th chords
+  'm9': [
+    {
+      name: 'rootless type a',
+      intervals: ['3m', '5P', '7m', '9M']
+    },
+    {
+      name: 'rootless type b',
+      intervals: ['7m', '9M', '10m', '12P']
+    },
+  ],
+  'maj9': [
+    {
+      name: 'rootless type a',
+      intervals: ['3M', '5P', '7M', '9M']
+    },
+    {
+      name: 'rootless type b',
+      intervals: ['7M', '9M', '10M', '12P']
+    },
+  ],
+
+  // 13th chords
+  '13': [
+    {
+      name: 'rootless type a',
+      intervals: ['7m', '9M', '10M', '13M']
+    },
+    {
+      name: 'rootless type b',
+      intervals: ['3M', '6M', '7m', '9M']
+    },
+  ]
+};
+for (let chordTypeName in voicings) {
+  const chordType = ChordType.get(chordTypeName);
+  voicings[chordTypeName].push(...getInversionVoicings(chordType.intervals))
+}
+
+
+export const VoicingGenerator = {
+  chordTypeNames: (): string[] => Object.keys(voicings),
+
+  forChord: (chordTypeName: string): Voicing[] => voicings[chordTypeName]
+}
+
+function getInversionVoicings(intervals: string[]): Voicing[] {
+  const result: Voicing[] = [];
+
+  for(let i = 0; i < intervals.length; i++) {
+    const name = i > 0 ? `${addSuffix(i)} inversion` : 'root position';
+    result.push({
+      name,
+      intervals: rotateArray(intervals, i)
+    });
+  }
+
+  return result;
+}
+
+function addSuffix(num: number): string {
+  const numString: string = num.toString();
+  const finalDigit: number = parseInt(numString[numString.length - 1]);
+  let suffix;
+  if (finalDigit === 1) {
+    suffix = 'st';
+  } else if (finalDigit === 2) {
+    suffix = 'nd';
+  } else if (finalDigit === 3) {
+    suffix = 'rd';
+  } else {
+    suffix = 'th';
+  }
+
+  return `${numString}${suffix}`;
+}
+
+
+// rotates array like: [1, 2, 3, 4, 5] -> [2, 3, 4, 5, 1]
+function rotateArray<T>(theArray: T[], times: number = 1): T[] {
+  theArray = [...theArray]; // shallow copy
+  if (theArray.length) {
+    for (let i = 0; i < times; i++) {
+      theArray.push(theArray.shift() as T);
+    }
+  }
+  return theArray;
+}
