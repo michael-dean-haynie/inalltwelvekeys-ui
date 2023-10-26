@@ -254,8 +254,9 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
             .reverse()
             .map(interval => ({ interval, direction: 'descending', finalForDirection: false })))
         }
-        if (repeatTonicOnReverseDirection) {
-          scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        scaleSteps[scaleSteps.length - 1].finalForDirection = true;
+        if (!repeatTonicOnReverseDirection) {
+          scaleSteps.pop();
         }
         for (let i = 0; i < octaves; i++) {
           scaleSteps = scaleSteps.concat([...scaleType.intervals]
