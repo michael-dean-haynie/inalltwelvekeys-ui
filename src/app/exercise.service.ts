@@ -69,49 +69,13 @@ export class ExerciseService {
     });
 
     this.exercises.push({
-      id: 'fd7259d3-ec4e-4db6-9bc0-47cab51b888d',
-      name: 'Major Scale',
-      description: '(descending then ascending)',
-      beats: [
-          '8P', // start an 8ve above
-          ...[...ScaleType.get('major').intervals].reverse(), // descending (shallow copy, reversed)
-          ...ScaleType.get('major').intervals.slice(1), // ascending (not repeating tonic)
-          '8P', // end an 8ve above
-        ]
-        .map(intervalLit => Interval.get(intervalLit))
-        .map(interval => RomanNumeral.get(interval))
-        .map(romanNumeral => ({
-          chordRomanNumeral: romanNumeral.name,
-          chordVoicing: ['1P']
-        }))
-    });
-
-    this.exercises.push({
-      id: 'fd7333d3-ec4e-4db6-9bc0-47cab51b888d',
-      name: 'Altered Scale',
-      description: '(descending then ascending)',
-      beats: [
-        '8P', // start an 8ve above
-        ...[...ScaleType.get('altered').intervals].reverse(), // descending (shallow copy, reversed)
-        ...ScaleType.get('altered').intervals.slice(1), // ascending (not repeating tonic)
-        '8P', // end an 8ve above
-      ]
-        .map(intervalLit => Interval.get(intervalLit))
-        .map(interval => RomanNumeral.get(interval))
-        .map(romanNumeral => ({
-          chordRomanNumeral: romanNumeral.name,
-          chordVoicing: ['1P']
-        }))
-    });
-
-    this.exercises.push({
       id: 'fd7259d3-ec4e-4da6-9bc0-47cab51b3fad',
-      name: 'Major II-V-I (open)',
-      description: 'Major II-V-I progressions, rootless voicing, (open)',
+      name: 'Major II-V-I (Rootless - Type A)',
+      description: '',
       beats: [
         {
           chordRomanNumeral: 'II',
-          chordType: 'min9',
+          chordType: 'm9',
           chordVoicing: ['3m', '5P', '7m', '9M']
         },
         {
@@ -129,12 +93,12 @@ export class ExerciseService {
 
     this.exercises.push({
       id: 'fd7259f3-ec4e-4da6-9bc0-47cab51b3fad',
-      name: 'Major II-V-I (closed)',
-      description: 'Major II-V-I progressions, rootless voicing, (closed)',
+      name: 'Major II-V-I (Rootless - Type B)',
+      description: '',
       beats: [
         {
           chordRomanNumeral: 'II',
-          chordType: 'min9',
+          chordType: 'm9',
           chordVoicing: ['7m', '9M', '10m', '12P']
         },
         {
@@ -146,6 +110,52 @@ export class ExerciseService {
           chordRomanNumeral: 'I',
           chordType: 'maj9',
           chordVoicing: ['7M', '9M', '10M', '12P']
+        },
+      ]
+    });
+
+    this.exercises.push({
+      id: 'fao659d3-ec4e-4da6-9bc0-47cab51b3fad',
+      name: 'Minor II-V-I (Rootless - Type A)',
+      description: '',
+      beats: [
+        {
+          chordRomanNumeral: 'II',
+          chordType: 'm9b5b9',
+          chordVoicing: ['3m', '5d', '7m', '9m']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordType: '13b9b13',
+          chordVoicing: ['7m', '9m', '10M', '13m']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordType: 'mM9',
+          chordVoicing: ['3m', '5P', '7M', '9M']
+        },
+      ]
+    });
+
+    this.exercises.push({
+      id: 'fd7259f3-eiie-4da6-9bc0-47cab51b3fad',
+      name: 'Minor II-V-I (Rootless - Type B)',
+      description: '',
+      beats: [
+        {
+          chordRomanNumeral: 'II',
+          chordType: 'm9b5b9',
+          chordVoicing: ['7m', '9m', '10m', '12d']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordType: '13b9b13',
+          chordVoicing: ['3M', '6m', '7m', '9m']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordType: 'mM9',
+          chordVoicing: ['7M', '9M', '10m', '12P']
         },
       ]
     });

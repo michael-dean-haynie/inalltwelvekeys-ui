@@ -16,6 +16,8 @@ const voicings: { [key: string]: Voicing[] } = {
   'm7': [],
   'maj7': [],
   '7': [],
+  // 'm7b5': [],
+  // 'm/maj7': [],
 
   // 9th chords
   'm9': [
@@ -38,6 +40,26 @@ const voicings: { [key: string]: Voicing[] } = {
       intervals: ['7M', '9M', '10M', '12P']
     },
   ],
+  'm9b5b9': [
+    {
+      name: 'rootless type a',
+      intervals: ['3m', '5d', '7m', '9m']
+    },
+    {
+      name: 'rootless type b',
+      intervals: ['7m', '9m', '10m', '12d']
+    },
+  ],
+  'mM9': [
+    {
+      name: 'rootless type a',
+      intervals: ['3m', '5P', '7M', '9M']
+    },
+    {
+      name: 'rootless type b',
+      intervals: ['7M', '9M', '10m', '12P']
+    },
+  ],
 
   // 13th chords
   '13': [
@@ -48,6 +70,16 @@ const voicings: { [key: string]: Voicing[] } = {
     {
       name: 'rootless type b',
       intervals: ['3M', '6M', '7m', '9M']
+    },
+  ],
+  '13b9b13': [
+    {
+      name: 'rootless type a',
+      intervals: ['7m', '9m', '10M', '13m']
+    },
+    {
+      name: 'rootless type b',
+      intervals: ['3M', '6m', '7m', '9m']
     },
   ]
 };
