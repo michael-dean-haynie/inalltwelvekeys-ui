@@ -97,6 +97,7 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
       }
       else {
         this.loadFormWithExercise(this.generateNewExercise());
+        this.addBeat()
         this.editMode = 'create';
         this.readyToDisplay = true;
       }
