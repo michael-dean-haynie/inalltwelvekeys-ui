@@ -12,8 +12,8 @@ export class ScaleGeneratorService {
     this._scaleGenerator = {
       scaleType: 'major',
       pattern: 'linear',
-      direction: 'ascending then descending',
-      octaves: 1
+      direction: 'descending then ascending',
+      octaves: 2
     }
   }
 
