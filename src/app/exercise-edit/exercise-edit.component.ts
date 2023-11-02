@@ -101,6 +101,11 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
         this.readyToDisplay = true;
       }
     }));
+
+    // expand single beat accordian
+    if (this.beats.controls.length === 1) {
+      this.toggleBeatPanel(0);
+    }
   }
 
   ngOnDestroy(): void {
@@ -180,10 +185,7 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
     }));
 
     const beatIndex = this.beats.controls.length - 1;
-    this.afterViewCheckedTasks.push(() => {
-      const button = document.querySelector(`[data-bs-target="#beatPanel-${beatIndex}"]`) as HTMLElement;
-      button.click();
-    });
+    this.toggleBeatPanel(beatIndex);
   }
 
   removeBeat(beatIndex: number): void {
@@ -418,5 +420,12 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
         // }
       ]
     }
+  }
+
+  private toggleBeatPanel(beatIndex: number): void {
+    this.afterViewCheckedTasks.push(() => {
+      const button = document.querySelector(`[data-bs-target="#beatPanel-${beatIndex}"]`) as HTMLElement;
+      button.click();
+    });
   }
 }
