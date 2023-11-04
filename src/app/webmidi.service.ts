@@ -8,9 +8,6 @@ import {Subject} from "rxjs";
 export class WebmidiService {
   readonly messageSubject: Subject<Message> = new Subject<Message>();
   private _midiAccess?: MIDIAccess;
-  // private _midiInputs?: MIDIInputMap;
-  // private _midiOutputs?: MIDIOutputMap;
-
 
   constructor() {
     if (window.navigator.requestMIDIAccess) {
@@ -29,20 +26,6 @@ export class WebmidiService {
     }
     return this._midiAccess;
   }
-
-  // private get midiInputs(): MIDIInputMap {
-  //   if (!this._midiInputs) {
-  //     throw new Error();
-  //   }
-  //   return this._midiInputs;
-  // }
-  //
-  // private get midiOutputs(): MIDIOutputMap {
-  //   if (!this._midiOutputs) {
-  //     throw new Error();
-  //   }
-  //   return this._midiOutputs;
-  // }
 
   private accessGrantedHandler(midiAccess: MIDIAccess): void {
     this._midiAccess = midiAccess;

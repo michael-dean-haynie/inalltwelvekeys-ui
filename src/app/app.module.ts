@@ -13,6 +13,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { NavComponent } from './nav/nav.component';
 import { ChordDetectorComponent } from './chord-detector/chord-detector.component';
+import { ToastComponent } from './toast/toast.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ChordDetectorComponent } from './chord-detector/chord-detector.componen
     ExercisesComponent,
     ExerciseEditComponent,
     NavComponent,
-    ChordDetectorComponent
+    ChordDetectorComponent,
+    ToastComponent
   ],
   imports: [
     BrowserModule,
