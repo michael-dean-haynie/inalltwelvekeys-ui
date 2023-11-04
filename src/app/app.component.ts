@@ -13,7 +13,10 @@ import {ToastService} from "./toast.service";
 export class AppComponent {
   title = `inalltwelvekeys-ui (${(environment as any).name})`;
 
-  constructor(private toastService: ToastService) {
+  constructor(
+    private toastService: ToastService,
+    private websocketService: WebsocketService
+  ) {
     document.onvisibilitychange = () => {
       console.log('onvisibilitychange triggered')
       // toastService.createToast({ heading: 'onvisibilitychange', message: document.visibilityState})
@@ -21,5 +24,9 @@ export class AppComponent {
         toastService.createToast({ heading: 'Welcome Back', message: 'Reconnecting ...'})
       }
     };
+  }
+
+  reconnect(): void {
+    this.websocketService.reConnect();
   }
 }
