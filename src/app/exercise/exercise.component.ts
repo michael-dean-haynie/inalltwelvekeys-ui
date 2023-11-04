@@ -215,7 +215,6 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     const keys = [...Note.names()].flatMap(noteName => [`${noteName}b`, noteName, `${noteName}#`]);
     do {
       keys.sort(shuffleAlgo);
-      // console.log(keys);
     } while (this.keysHasNeigboringEnharmonics(keys))
     return keys;
   }

@@ -54,7 +54,6 @@ export class PianoComponent implements OnInit, OnDestroy {
 
   private initializeActiveNotesSubscription(): void {
     this.subscriptions.push(this.activeNotesService.activeNotesSubject.subscribe((activeNotes) => {
-      console.log(activeNotes);
       this.pianoChartAdapter.updateActiveNotes(activeNotes);
     }));
   }

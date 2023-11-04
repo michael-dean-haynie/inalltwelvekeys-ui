@@ -31,7 +31,6 @@ export class WebsocketService implements OnDestroy{
       deserializer: (messageEvent) => messageEvent
     });
 
-    console.log(this.messageEventSubject);
     this.subscriptions.push(this.messageEventSubject.subscribe(data => console.log(data)));
 
     // pipe the midi messages out to their own subscribable subject for service consumers

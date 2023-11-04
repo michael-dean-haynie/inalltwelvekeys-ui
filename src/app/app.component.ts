@@ -18,15 +18,10 @@ export class AppComponent {
     private websocketService: WebsocketService
   ) {
     document.onvisibilitychange = () => {
-      console.log('onvisibilitychange triggered')
-      // toastService.createToast({ heading: 'onvisibilitychange', message: document.visibilityState})
       if (document.visibilityState === 'visible') {
         toastService.createToast({ heading: 'Welcome Back', message: 'Reconnecting ...'})
+        websocketService.reConnect();
       }
     };
-  }
-
-  reconnect(): void {
-    this.websocketService.reConnect();
   }
 }
