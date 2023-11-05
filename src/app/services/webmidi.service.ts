@@ -1,15 +1,18 @@
-import { Injectable } from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {Message} from "webmidi";
-import {Subject} from "rxjs";
+import {Subject, Subscription} from "rxjs";
+import {WebsocketService} from "./websocket.service";
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebmidiService {
+export class WebmidiService implements OnDestroy{
   readonly messageSubject: Subject<Message> = new Subject<Message>();
   private _midiAccess?: MIDIAccess;
+  private subscriptions: Subscription[] = [];
 
-  constructor() {
+  constructor(private websocketService: WebsocketService) {
+    // start listening for MIDI
     if (window.navigator.requestMIDIAccess) {
       window.navigator.requestMIDIAccess().then(
         (midiAccess) => this.accessGrantedHandler(midiAccess),
@@ -18,6 +21,12 @@ export class WebmidiService {
     } else {
       console.log('Web MIDI API is not available on your browser.')
     }
+
+    // pipe MIDI through to server through websocket
+    this.subscriptions.push(this.messageSubject.subscribe(msg => {
+      console.log(msg);
+      websocketService.send(JSON.stringify([...msg.rawData]));
+    }));
   }
 
   private get midiAccess(): MIDIAccess {
@@ -61,6 +70,12 @@ export class WebmidiService {
       }(this.messageSubject)); // inject subject into IIFE
     }
 
+  }
+
+  ngOnDestroy(): void {
+    for (let subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 
 }

@@ -9,9 +9,9 @@ import {ToastService} from "./toast.service";
   providedIn: 'root'
 })
 export class WebsocketService implements OnDestroy{
-  public readonly midiMessageSubject: Subject<MidiMessage> = new Subject<MidiMessage>();
+  public readonly midiMessageBytesSubject: Subject<number[]> = new Subject<number[]>();
 
-  private messageEventSubject?: Subject<MessageEvent>;
+  private messageEventSubject?: Subject<any>;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -37,19 +37,27 @@ export class WebsocketService implements OnDestroy{
       this.unsubscribe();
     }
 
-    this.messageEventSubject = webSocket<MessageEvent>({
+    this.messageEventSubject = webSocket({
       url: (environment as any).websocketUrl,
       deserializer: (messageEvent) => messageEvent
     });
 
     // pipe the midi messages out to their own subscribable subject for service consumers
-    const midiMessageObservable: Observable<MidiMessage> = this.messageEventSubject.pipe(
-      filter(messageEvent => messageEvent.data !== undefined), // TODO: better check?
-      map(messageEvent => JSON.parse(messageEvent.data) as MidiMessage)
+    const midiMessageBytesObservable: Observable<number[]> = this.messageEventSubject.pipe(
+      // filter(messageEvent => messageEvent.data !== undefined), // TODO: better check?
+      // map(messageEvent => JSON.parse(messageEvent.data) as MidiMessage)
+      map(messageEvent => JSON.parse(messageEvent) as number[])
     );
-    this.subscriptions.push(midiMessageObservable.subscribe(midiMessage => {
-      this.midiMessageSubject.next(midiMessage);
+    this.subscriptions.push(midiMessageBytesObservable.subscribe(midiMessage => {
+      this.midiMessageBytesSubject.next(midiMessage);
     }));
+  }
+
+  send(message: string): void {
+    if (!this.messageEventSubject) {
+      throw new Error('Could not send websocket message. Websocket connection does not exist.');
+    }
+    this.messageEventSubject.next(message);
   }
 
   private unsubscribe(): void {
