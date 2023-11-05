@@ -3,6 +3,7 @@ import {filter, map, Observable, Subject, Subscription, tap} from "rxjs";
 import { webSocket} from "rxjs/webSocket";
 import {environment} from "../environments/environment";
 import {MidiMessage} from "./models/api/midi-message";
+import {ToastService} from "./toast.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,18 @@ export class WebsocketService implements OnDestroy{
   private messageEventSubject?: Subject<MessageEvent>;
   private subscriptions: Subscription[] = [];
 
-  constructor(){
+  constructor(
+    private toastService: ToastService
+  ){
     this.reConnect();
+
+    // reconnect whenever document becomes visible again
+    document.onvisibilitychange = () => {
+      if (document.visibilityState === 'visible') {
+        toastService.createToast({ heading: 'Welcome Back', message: 'Reconnecting ...'})
+        this.reConnect();
+      }
+    };
   }
 
   ngOnDestroy(): void {
@@ -30,8 +41,6 @@ export class WebsocketService implements OnDestroy{
       url: (environment as any).websocketUrl,
       deserializer: (messageEvent) => messageEvent
     });
-
-    this.subscriptions.push(this.messageEventSubject.subscribe(data => console.log(data)));
 
     // pipe the midi messages out to their own subscribable subject for service consumers
     const midiMessageObservable: Observable<MidiMessage> = this.messageEventSubject.pipe(
