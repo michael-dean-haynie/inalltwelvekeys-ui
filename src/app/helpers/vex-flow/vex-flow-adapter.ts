@@ -1,9 +1,4 @@
-import {Factory, FactoryOptions, StaveConnector, Vex, Voice} from "vexflow";
-import {MidiMessage} from "../api/midi-message";
-import {MidiNote} from "../midi-note";
-import {PianoKey} from "../piano-key";
-import {PitchClass} from "../pitch-class";
-import {INoteValue} from "piano-chart";
+import {FactoryOptions, Vex, Voice} from "vexflow";
 import {Midi, Note} from "tonal";
 
 export class VexFlowAdapter {

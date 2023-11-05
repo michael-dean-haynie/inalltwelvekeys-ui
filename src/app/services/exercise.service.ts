@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {Exercise} from "./models/api/exercise";
+import {Exercise} from "../models/api/exercise";
 import {HttpClient} from "@angular/common/http";
 import {Observable, of} from "rxjs";
 import { v4 as uuidv4 } from "uuid";
-import {Accidentals, NoteLetters} from "./models/notation";
+import {Accidentals, NoteLetters} from "../models/notation";
 import {Interval, RomanNumeral, ScaleType} from "tonal";
 
 @Injectable({

@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ToastService} from "../toast.service";
-import {Toast} from "../models/toast";
+import {ToastService} from "../../services/toast.service";
+import {Toast} from "../../models/toast";
 import {Subscription} from "rxjs";
 
 @Component({

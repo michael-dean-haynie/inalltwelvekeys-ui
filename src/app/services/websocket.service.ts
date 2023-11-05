@@ -1,8 +1,8 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {filter, map, Observable, Subject, Subscription, tap} from "rxjs";
 import { webSocket} from "rxjs/webSocket";
-import {environment} from "../environments/environment";
-import {MidiMessage} from "./models/api/midi-message";
+import {environment} from "../../environments/environment";
+import {MidiMessage} from "../models/api/midi-message";
 import {ToastService} from "./toast.service";
 
 @Injectable({

@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PianoComponent } from "./piano/piano.component";
-import { NotFoundComponent } from "./not-found/not-found.component";
-import {ExerciseComponent} from "./exercise/exercise.component";
-import {ExercisesComponent} from "./exercises/exercises.component";
-import {ExerciseEditComponent} from "./exercise-edit/exercise-edit.component";
-import {StaffComponent} from "./staff/staff.component";
+import { PianoComponent } from "./components/piano/piano.component";
+import { NotFoundComponent } from "./components/not-found/not-found.component";
+import {ExerciseComponent} from "./components/exercise/exercise.component";
+import {ExercisesComponent} from "./components/exercises/exercises.component";
+import {ExerciseEditComponent} from "./components/exercise-edit/exercise-edit.component";
+import {StaffComponent} from "./components/staff/staff.component";
 
 const routes: Routes = [
   { path: 'exercise/edit/:id', component: ExerciseEditComponent },

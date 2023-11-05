@@ -1,15 +1,12 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {ExerciseService} from "../exercise.service";
+import {ExerciseService} from "../../services/exercise.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {Exercise} from "../models/api/exercise";
-import {shuffleAlgo} from "../utilities/math-utilities";
-import {PitchClass} from "../models/pitch-class";
-import {SpelledPitchClass} from "../models/spelled-pitch-class";
-import {Accidentals} from "../models/notation";
+import {Exercise} from "../../models/api/exercise";
+import {shuffleAlgo} from "../../utilities/math-utilities";
 import {Subscription} from "rxjs";
-import {ActiveNotesService} from "../active-notes.service";
-import {Interval, Midi, Note, Progression, ScaleType} from "tonal";
-import {ExerciseBeat} from "../models/api/exercise-beat";
+import {ActiveNotesService} from "../../services/active-notes.service";
+import {Note, Progression,} from "tonal";
+import {ExerciseBeat} from "../../models/api/exercise-beat";
 
 @Component({
   selector: 'app-exercise',

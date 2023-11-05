@@ -2,18 +2,18 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { NotFoundComponent } from './not-found/not-found.component';
-import { PianoComponent } from './piano/piano.component';
-import { StaffComponent } from './staff/staff.component';
-import { ExerciseComponent } from './exercise/exercise.component';
-import { ExercisesComponent } from './exercises/exercises.component';
-import { ExerciseEditComponent } from './exercise-edit/exercise-edit.component';
+import { AppComponent } from './components/app/app.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { PianoComponent } from './components/piano/piano.component';
+import { StaffComponent } from './components/staff/staff.component';
+import { ExerciseComponent } from './components/exercise/exercise.component';
+import { ExercisesComponent } from './components/exercises/exercises.component';
+import { ExerciseEditComponent } from './components/exercise-edit/exercise-edit.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
-import { NavComponent } from './nav/nav.component';
-import { ChordDetectorComponent } from './chord-detector/chord-detector.component';
-import { ToastComponent } from './toast/toast.component';
+import { NavComponent } from './components/nav/nav.component';
+import { ChordDetectorComponent } from './components/chord-detector/chord-detector.component';
+import { ToastComponent } from './components/toast/toast.component';
 
 @NgModule({
   declarations: [

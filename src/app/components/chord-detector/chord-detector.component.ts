@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from "rxjs";
 import {Chord, Midi, Note} from "tonal";
-import {ActiveNotesService} from "../active-notes.service";
+import {ActiveNotesService} from "../../services/active-notes.service";
 
 @Component({
   selector: 'app-chord-detector',

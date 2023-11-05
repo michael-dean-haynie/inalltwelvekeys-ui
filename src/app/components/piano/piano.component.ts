@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Instrument } from "piano-chart";
-import {PianoChartAdapter} from "../models/piano-chart/piano-chart-adapter";
+import {PianoChartAdapter} from "../../helpers/piano-chart/piano-chart-adapter";
 import {Subscription} from "rxjs";
-import {ActiveNotesService} from "../active-notes.service";
+import {ActiveNotesService} from "../../services/active-notes.service";
 
 @Component({
   selector: 'app-piano',

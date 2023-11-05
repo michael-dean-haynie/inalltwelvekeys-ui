@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {ScaleGenerator} from "./models/api/scale-generator";
-import {deepCopy} from "./utilities/json-utilities";
+import {ScaleGenerator} from "../models/api/scale-generator";
+import {deepCopy} from "../utilities/json-utilities";
 
 @Injectable({
   providedIn: 'root'

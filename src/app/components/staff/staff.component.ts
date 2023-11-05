@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {VexFlowAdapter} from "../models/vex-flow/vex-flow-adapter";
+import {VexFlowAdapter} from "../../helpers/vex-flow/vex-flow-adapter";
 import {Subscription} from "rxjs";
-import {ActiveNotesService} from "../active-notes.service";
+import {ActiveNotesService} from "../../services/active-notes.service";
 
 @Component({
   selector: 'app-staff',

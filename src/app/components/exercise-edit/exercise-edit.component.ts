@@ -1,16 +1,16 @@
 import {AfterViewChecked, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
-import {ExerciseService} from "../exercise.service";
-import {Exercise} from "../models/api/exercise";
+import {ExerciseService} from "../../services/exercise.service";
+import {Exercise} from "../../models/api/exercise";
 import { v4 as uuidv4 } from "uuid";
 import {Interval, RomanNumeral, ScaleType, Tonal} from "tonal";
-import {ScalePattern} from "../utilities/scale-pattern";
-import {ExerciseBeat} from "../models/api/exercise-beat";
-import {posModRes} from "../utilities/math-utilities";
+import {ScalePattern} from "../../utilities/scale-pattern";
+import {ExerciseBeat} from "../../models/api/exercise-beat";
+import {posModRes} from "../../utilities/math-utilities";
 import {forkJoin, Subscription, take} from "rxjs";
-import {ScaleGeneratorService} from "../scale-generator.service";
-import {VoicingGenerator} from "../utilities/voicing-generator";
+import {ScaleGeneratorService} from "../../services/scale-generator.service";
+import {VoicingGenerator} from "../../utilities/voicing-generator";
 
 @Component({
   selector: 'app-exercise-edit',
