@@ -24,7 +24,7 @@ export class WebmidiService implements OnDestroy{
 
     // pipe MIDI through to server through websocket
     this.subscriptions.push(this.messageSubject.subscribe(msg => {
-      websocketService.send(JSON.stringify({ bytes: [...msg.rawData] }));
+      websocketService.send({ bytes: [...msg.rawData] });
     }));
   }
 

@@ -52,7 +52,7 @@ export class WebsocketService implements OnDestroy{
     }));
   }
 
-  send(message: string): void {
+  send(message: object): void {
     if (!this.messageEventSubject) {
       throw new Error('Could not send websocket message. Websocket connection does not exist.');
     }
