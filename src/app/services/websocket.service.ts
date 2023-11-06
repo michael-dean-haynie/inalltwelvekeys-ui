@@ -39,7 +39,10 @@ export class WebsocketService implements OnDestroy{
 
     this.messageEventSubject = webSocket({
       url: (environment as any).websocketUrl,
-      deserializer: (messageEvent) => messageEvent
+      deserializer: (messageEvent) => {
+        console.log(messageEvent)
+        return messageEvent
+      }
     });
 
     // pipe the midi messages out to their own subscribable subject for service consumers
