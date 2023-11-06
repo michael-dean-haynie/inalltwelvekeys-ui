@@ -2,6 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {Subject, Subscription} from "rxjs";
 import {WebsocketService} from "./websocket.service";
 import {WebmidiService} from "./webmidi.service";
+import {Message} from "webmidi";
 
 @Injectable({
   providedIn: 'root'
@@ -17,11 +18,15 @@ export class ActiveNotesService implements OnDestroy {
   ) {
     // subscribe to midi events from the websocket
     this.subscriptions.push(this.websocketService.midiMessageSubject.subscribe(midiMessage => {
-      if (midiMessage.type === 'note_on'){
-        this.handleNoteOnMidiEvent(midiMessage.note);
-      }
-      if (midiMessage.type === 'note_off'){
-        this.handleNoteOffMidiEvent(midiMessage.note);
+      if (midiMessage.bytes) {
+        const message = new Message(new Uint8Array(midiMessage.bytes))
+        const midiNoteNumber = message.data[1];
+        if (message.type === 'noteon') {
+          this.handleNoteOnMidiEvent(midiNoteNumber);
+        }
+        if (message.type === 'noteoff') {
+          this.handleNoteOffMidiEvent(midiNoteNumber);
+        }
       }
     }));
 
