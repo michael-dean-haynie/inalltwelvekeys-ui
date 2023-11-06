@@ -6,6 +6,7 @@ import {ExerciseComponent} from "./components/exercise/exercise.component";
 import {ExercisesComponent} from "./components/exercises/exercises.component";
 import {ExerciseEditComponent} from "./components/exercise-edit/exercise-edit.component";
 import {StaffComponent} from "./components/staff/staff.component";
+import {MidiTestComponent} from "./components/midi-test/midi-test.component";
 
 const routes: Routes = [
   { path: 'exercise/edit/:id', component: ExerciseEditComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'piano', component: PianoComponent },
   { path: 'staff', component: StaffComponent },
   { path: 'stave', redirectTo: 'staff', pathMatch: 'full' },
+  { path: 'midi-test', component: MidiTestComponent },
   { path: '', redirectTo: 'piano', pathMatch: 'full' },
   { path: '404', component: NotFoundComponent },
   { path: '**', component: NotFoundComponent },

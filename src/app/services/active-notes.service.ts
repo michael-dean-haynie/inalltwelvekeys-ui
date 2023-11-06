@@ -3,6 +3,7 @@ import {Subject, Subscription} from "rxjs";
 import {WebsocketService} from "./websocket.service";
 import {WebmidiService} from "./webmidi.service";
 import {Message} from "webmidi";
+import {MidiMessageService} from "./midi-message.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,25 +14,11 @@ export class ActiveNotesService implements OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
+    private midiMessageService: MidiMessageService,
     private websocketService: WebsocketService,
     private webmidiService: WebmidiService,
   ) {
-    // subscribe to midi events from the websocket
-    this.subscriptions.push(this.websocketService.midiMessageSubject.subscribe(midiMessage => {
-      if (midiMessage.bytes) {
-        const message = new Message(new Uint8Array(midiMessage.bytes))
-        const midiNoteNumber = message.data[1];
-        if (message.type === 'noteon') {
-          this.handleNoteOnMidiEvent(midiNoteNumber);
-        }
-        if (message.type === 'noteoff') {
-          this.handleNoteOffMidiEvent(midiNoteNumber);
-        }
-      }
-    }));
-
-    // subscribe to midi events from the browser
-    this.subscriptions.push(this.webmidiService.messageSubject.subscribe(message => {
+    this.subscriptions.push(this.midiMessageService.midiMessageSubject.subscribe(message => {
       const midiNoteNumber = message.data[1];
       if (message.type === 'noteon') {
         this.handleNoteOnMidiEvent(midiNoteNumber);

@@ -14,6 +14,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { NavComponent } from './components/nav/nav.component';
 import { ChordDetectorComponent } from './components/chord-detector/chord-detector.component';
 import { ToastComponent } from './components/toast/toast.component';
+import { MidiTestComponent } from './components/midi-test/midi-test.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { ToastComponent } from './components/toast/toast.component';
     ExerciseEditComponent,
     NavComponent,
     ChordDetectorComponent,
-    ToastComponent
+    ToastComponent,
+    MidiTestComponent
   ],
   imports: [
     BrowserModule,
