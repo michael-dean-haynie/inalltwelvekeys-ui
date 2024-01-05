@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {MidiMessageService} from "../../services/midi-message.service";
 import {Subscription} from "rxjs";
-import MidiWriter from 'midi-writer-js';
+import { Piano } from '@tonejs/piano'
 
 @Component({
   selector: 'app-midi-test',
@@ -14,14 +14,11 @@ export class MidiTestComponent implements OnInit, OnDestroy {
   constructor(
     private midiMessageService: MidiMessageService
   ) {
-    this.subscriptions.push(midiMessageService.midiMessageSubject.subscribe(message => {
-      console.log(message);
-    }));
+
 
   }
 
   ngOnInit(): void {
-    this.helloWorld();
   }
 
   ngOnDestroy(): void {
@@ -30,21 +27,52 @@ export class MidiTestComponent implements OnInit, OnDestroy {
     }
   }
 
+  enableAudio(): void {
+    // audio context won't load before user gesture? https://developer.chrome.com/blog/autoplay/#webaudio
+    this.helloWorld();
+  }
+
   private helloWorld(): void {
+    // create the piano and load 5 velocity steps
+    const piano = new Piano({
+      // velocities: 5
+    });
 
-    // Start with a new track
-    const track = new MidiWriter.Track();
+    // connect it to the speaker output
+    piano.toDestination();
 
-    // Define an instrument (optional):
-    track.addEvent(new MidiWriter.ProgramChangeEvent({instrument: 1}));
+    piano.load().then(() => {
+      console.log('loaded!');
 
-    // Add some notes:
-    const note = new MidiWriter.NoteEvent({pitch: ['C4', 'E4', 'G4'], duration: '4'});
-    track.addEvent(note);
+      this.subscriptions.push(this.midiMessageService.midiMessageSubject.subscribe(message => {
+        console.log(message);
+        const midiNoteNumber = message.data[1].toString();
+        const midiNoteVelocity = Number((message.data[2] / 127).toFixed(3)); // convert to value between 0-1 rounded to 3 decimal places
+        if (message.type === 'noteon') {
+          // this.handleNoteOnMidiEvent(midiNoteNumber);
+          piano.keyDown({ note: midiNoteNumber, velocity: midiNoteVelocity });
+        }
+        if (message.type === 'noteoff') {
+          // this.handleNoteOffMidiEvent(midiNoteNumber);
+          piano.keyUp({ note: midiNoteNumber, velocity: midiNoteVelocity });
+        }
+        if (message.type === 'controlchange') {
 
-    // Generate a data URI
-    const write = new MidiWriter.Writer(track);
-    console.log(write.dataUri());
+          const channel = message.data[0];
+          const controlNumber = message.data[1];
+          const valueNumber = message.data[2];
+
+          if (controlNumber === 64 && channel === 176) { // damper pedal on/off (sustain)
+            if (valueNumber <= 63) {
+              piano.pedalUp();
+            }
+            else if (valueNumber >= 64) {
+              piano.pedalDown();
+            }
+          }
+        }
+      }));
+    });
   }
 
 }

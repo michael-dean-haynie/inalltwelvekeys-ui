@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {Message} from "webmidi";
+import {Message} from "webmidi3";
 import {Subject, Subscription} from "rxjs";
 import {WebsocketService} from "./websocket.service";
 

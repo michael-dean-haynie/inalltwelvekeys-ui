@@ -1,8 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Subject, Subscription} from "rxjs";
-import {WebsocketService} from "./websocket.service";
-import {WebmidiService} from "./webmidi.service";
-import {Message} from "webmidi";
+import {Message} from "webmidi3";
 import {MidiMessageService} from "./midi-message.service";
 
 @Injectable({
@@ -15,8 +13,6 @@ export class ActiveNotesService implements OnDestroy {
 
   constructor(
     private midiMessageService: MidiMessageService,
-    private websocketService: WebsocketService,
-    private webmidiService: WebmidiService,
   ) {
     this.subscriptions.push(this.midiMessageService.midiMessageSubject.subscribe(message => {
       const midiNoteNumber = message.data[1];
