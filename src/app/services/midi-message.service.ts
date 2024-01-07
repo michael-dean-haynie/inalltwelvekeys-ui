@@ -24,8 +24,8 @@ export class MidiMessageService implements OnDestroy{
     }));
 
     // subscribe to midi events from the browser
-    this.subscriptions.push(this.webmidiService.messageSubject.subscribe(message => {
-      this.midiMessageSubject.next(message);
+    this.subscriptions.push(this.webmidiService.messageSubject.subscribe(tsMsg => {
+      this.midiMessageSubject.next(tsMsg.message);
     }));
   }
 

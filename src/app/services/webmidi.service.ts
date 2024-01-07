@@ -2,12 +2,13 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {Message} from "webmidi3";
 import {Subject, Subscription} from "rxjs";
 import {WebsocketService} from "./websocket.service";
+import {TimestampedMessage} from "../models/timestamped-message";
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebmidiService implements OnDestroy{
-  readonly messageSubject: Subject<Message> = new Subject<Message>();
+  readonly messageSubject: Subject<TimestampedMessage> = new Subject<TimestampedMessage>();
   private _midiAccess?: MIDIAccess;
   private subscriptions: Subscription[] = [];
 
@@ -23,8 +24,13 @@ export class WebmidiService implements OnDestroy{
     }
 
     // pipe MIDI through to server through websocket
-    this.subscriptions.push(this.messageSubject.subscribe(msg => {
-      websocketService.send({ bytes: [...msg.rawData] });
+    this.subscriptions.push(this.messageSubject.subscribe(tsMsg => {
+      const payload = {
+        timestamp: tsMsg.timestamp,
+        bytes: [...tsMsg.message.rawData]
+      };
+      console.log('payload', payload);
+      websocketService.send(payload);
     }));
   }
 
@@ -60,10 +66,10 @@ export class WebmidiService implements OnDestroy{
       (function (messageSubject) {
         const _port = port; // copy (do not share ref)
         inputs[_port].onmidimessage = function (event) {
+          const timestamp = Date.now();
           const midiMessageEvent = event as MIDIMessageEvent;
           const message = new Message(midiMessageEvent.data);
-          messageSubject.next(message);
-
+          messageSubject.next({ message, timestamp });
         };
 
       }(this.messageSubject)); // inject subject into IIFE

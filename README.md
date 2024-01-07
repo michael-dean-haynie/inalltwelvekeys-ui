@@ -3,6 +3,13 @@
 ## Handy for quick side loading on server
 sudo git pull && sudo npm install && sudo npm run deploy
 
+... or if you have to use scp because building on server causes memory overflow
+```shell
+# !!first have to delete the /inalltwelvekeys-ui dir from the backend repo on the server
+npm run build
+scp -r /Users/michael/code/mine/inalltwelvekeys-ui/dist/inalltwelvekeys-ui root@172.104.194.49:/root/inalltwelvekeys/inalltwelvekeys-ui
+```
+
 ## Package.json Notes
 
 ```json
