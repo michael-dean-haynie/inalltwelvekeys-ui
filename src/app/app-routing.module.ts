@@ -7,6 +7,7 @@ import {ExercisesComponent} from "./components/exercises/exercises.component";
 import {ExerciseEditComponent} from "./components/exercise-edit/exercise-edit.component";
 import {StaffComponent} from "./components/staff/staff.component";
 import {MidiTestComponent} from "./components/midi-test/midi-test.component";
+import {HistoryComponent} from "./components/history/history.component";
 
 const routes: Routes = [
   { path: 'exercise/edit/:id', component: ExerciseEditComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'staff', component: StaffComponent },
   { path: 'stave', redirectTo: 'staff', pathMatch: 'full' },
   { path: 'midi-test', component: MidiTestComponent },
+  { path: 'history', component: HistoryComponent },
   { path: '', redirectTo: 'piano', pathMatch: 'full' },
   { path: '404', component: NotFoundComponent },
   { path: '**', component: NotFoundComponent },

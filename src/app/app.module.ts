@@ -15,6 +15,7 @@ import { NavComponent } from './components/nav/nav.component';
 import { ChordDetectorComponent } from './components/chord-detector/chord-detector.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { MidiTestComponent } from './components/midi-test/midi-test.component';
+import { HistoryComponent } from './components/history/history.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { MidiTestComponent } from './components/midi-test/midi-test.component';
     NavComponent,
     ChordDetectorComponent,
     ToastComponent,
-    MidiTestComponent
+    MidiTestComponent,
+    HistoryComponent
   ],
   imports: [
     BrowserModule,
