@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "inalltwelvekeys-ui:build:production"
+              "buildTarget": "inalltwelvekeys-ui:build:production"
             },
             "development": {
-              "browserTarget": "inalltwelvekeys-ui:build:development"
+              "buildTarget": "inalltwelvekeys-ui:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -82,7 +82,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "inalltwelvekeys-ui:build"
+            "buildTarget": "inalltwelvekeys-ui:build"
           }
         },
         "test": {
