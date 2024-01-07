@@ -31,7 +31,6 @@
     "uuid": "^9.0.1",
     "vexflow": "^4.2.3",
     "webmidi": "^2.5.1",
-    "webmidi3": "npm:webmidi@^3.1.6",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
