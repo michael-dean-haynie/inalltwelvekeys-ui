@@ -1,6 +1,8 @@
 <p>history works!</p>
 <dp-date-picker #dayPicker theme="dp-material" (onChange)="dpChange($event)"></dp-date-picker>
 
+<!--<div>Playback is playing: {{playing ? 'true' : 'false'}}</div>-->
+
 <ul class="list-group segment-list mb-3">
   <ng-container *ngFor="let segment of segments; index as segmentIndex">
     <li class="list-group-item">
@@ -12,7 +14,12 @@
           <span>&nbsp;({{displayDuration(segment.segDuration)}})</span>
         </span>
 
-        <button type="button" class="btn btn-primary" (click)="playSegment(segment)">Play</button>
+        <ng-container *ngIf="!(playing && playingSegmentIndex === segmentIndex)">
+          <button type="button" class="btn btn-primary" (click)="playSegment(segmentIndex)">Play</button>
+        </ng-container>
+        <ng-container *ngIf="playing && playingSegmentIndex === segmentIndex">
+          <button type="button" class="btn btn-primary" (click)="stopPlaying()">Stop</button>
+        </ng-container>
       </div>
 
     </li>

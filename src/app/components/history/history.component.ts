@@ -4,6 +4,7 @@ import {Subscription} from "rxjs";
 import {DatePickerComponent} from "ng2-date-picker";
 import * as dayjs from 'dayjs'
 import {Segment} from "../../models/api/segment";
+import {PlaybackService} from "../../services/playback.service";
 
 @Component({
   selector: 'app-history',
@@ -16,8 +17,12 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
   private subscriptions: Subscription[] = [];
 
   public segments: Segment[] = [];
+  public playingSegmentIndex = 0;
 
-  constructor(private messageClient: MessageClientService) {}
+  constructor(
+    private messageClient: MessageClientService,
+    private playbackService: PlaybackService
+  ) {}
 
   ngAfterViewInit(): void {
     const today = dayjs(Date.now()).startOf('day')
@@ -28,6 +33,10 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
     for (let subscription of this.subscriptions) {
       subscription.unsubscribe();
     }
+  }
+
+  public get playing(): boolean {
+    return this.playbackService.playing;
   }
 
   dpChange(event: any): void {
@@ -47,12 +56,20 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
     }));
   }
 
-  playSegment(segment: Segment) {
+  public playSegment(segmentIndex: number) {
+    this.stopPlaying();
+    this.playingSegmentIndex = segmentIndex;
+    const segment = this.segments[segmentIndex];
     this.subscriptions.push(
       this.messageClient.getSegment(segment.segStartTimestamp, segment.segEndTimestamp)
-        .subscribe(msgs  => {
+        .subscribe(async (msgs)  => {
           console.log('messages', msgs);
+          await this.playbackService.playMessages(msgs);
     }));
+  }
+
+  public stopPlaying() {
+    this.playbackService.stopPlayingMessages();
   }
 
   displayTime(timestamp: number): string {
