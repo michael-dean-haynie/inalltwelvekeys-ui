@@ -8,10 +8,11 @@
     <li class="list-group-item">
       <div class="flex-container">
         <span>
-          <span>{{displayTime(segment.segStartTimestamp)}}</span>
+          <span><b>Time</b>:&nbsp;{{displayTime(segment.segStartTimestamp)}}</span>
           <span>&nbsp;-&nbsp;</span>
           <span>{{displayTime(segment.segEndTimestamp)}}</span>
-          <span>&nbsp;({{displayDuration(segment.segDuration)}})</span>
+          <span>&nbsp;<b>Duration</b>:&nbsp;{{displayDuration(segment.segDuration)}}</span>
+          <span>&nbsp;<b>Keystrokes</b>: {{segment.keystrokes}}</span>
         </span>
 
         <ng-container *ngIf="!(playing && playingSegmentIndex === segmentIndex)">
