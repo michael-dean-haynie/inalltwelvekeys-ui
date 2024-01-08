@@ -18,6 +18,7 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
 
   public segments: Segment[] = [];
   public playingSegmentIndex = 0;
+  public gapSize = 10;
 
   constructor(
     private messageClient: MessageClientService,
@@ -50,7 +51,7 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
     console.log('start', start);
     console.log('end', end);
 
-    this.subscriptions.push(this.messageClient.getSegments(start, end).subscribe(sgmts  => {
+    this.subscriptions.push(this.messageClient.getSegments(start, end, this.gapSize).subscribe(sgmts  => {
       console.log('segments', sgmts);
       this.segments = sgmts;
     }));
@@ -71,6 +72,7 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
   public stopPlaying() {
     this.playbackService.stopPlayingMessages();
   }
+
 
   displayTime(timestamp: number): string {
     return dayjs(timestamp).format('HH:mm:ss');

@@ -1,8 +1,6 @@
 <p>history works!</p>
 <dp-date-picker #dayPicker theme="dp-material" (onChange)="dpChange($event)"></dp-date-picker>
 
-<!--<div>Playback is playing: {{playing ? 'true' : 'false'}}</div>-->
-
 <ul class="list-group segment-list mb-3">
   <ng-container *ngFor="let segment of segments; index as segmentIndex">
     <li class="list-group-item">

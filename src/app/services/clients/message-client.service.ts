@@ -13,9 +13,9 @@ export class MessageClientService {
 
   constructor(private http: HttpClient) {}
 
-  getSegments(start: string, end: string): Observable<Segment[]> {
+  getSegments(start: string, end: string, gapSize: number): Observable<Segment[]> {
     const options = {
-      params: new HttpParams().set('start', start).set('end', end)
+      params: new HttpParams().set('start', start).set('end', end).set('gapSize', gapSize)
     };
 
     return this.http.get<Segment[]>(`${this.apiUrl}/message/segments`, options);
