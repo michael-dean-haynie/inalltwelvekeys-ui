@@ -1,2 +1,20 @@
 <p>history works!</p>
 <dp-date-picker #dayPicker theme="dp-material" (onChange)="dpChange($event)"></dp-date-picker>
+
+<ul class="list-group segment-list mb-3">
+  <ng-container *ngFor="let segment of segments; index as segmentIndex">
+    <li class="list-group-item">
+      <div class="flex-container">
+        <span>
+          <span>{{displayTime(segment.segStartTimestamp)}}</span>
+          <span>&nbsp;-&nbsp;</span>
+          <span>{{displayTime(segment.segEndTimestamp)}}</span>
+          <span>&nbsp;({{displayDuration(segment.segDuration)}})</span>
+        </span>
+
+        <button type="button" class="btn btn-primary" (click)="playSegment(segment)">Play</button>
+      </div>
+
+    </li>
+  </ng-container>
+</ul>

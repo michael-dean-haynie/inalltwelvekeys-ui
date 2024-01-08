@@ -3,6 +3,7 @@ import {MessageClientService} from "../../services/clients/message-client.servic
 import {Subscription} from "rxjs";
 import {DatePickerComponent} from "ng2-date-picker";
 import * as dayjs from 'dayjs'
+import {Segment} from "../../models/api/segment";
 
 @Component({
   selector: 'app-history',
@@ -13,6 +14,8 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
   @ViewChild('dayPicker') datePicker!: DatePickerComponent;
 
   private subscriptions: Subscription[] = [];
+
+  public segments: Segment[] = [];
 
   constructor(private messageClient: MessageClientService) {}
 
@@ -40,7 +43,32 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
 
     this.subscriptions.push(this.messageClient.getSegments(start, end).subscribe(sgmts  => {
       console.log('segments', sgmts);
+      this.segments = sgmts;
     }));
+  }
+
+  playSegment(segment: Segment) {
+    this.subscriptions.push(
+      this.messageClient.getSegment(segment.segStartTimestamp, segment.segEndTimestamp)
+        .subscribe(msgs  => {
+          console.log('messages', msgs);
+    }));
+  }
+
+  displayTime(timestamp: number): string {
+    return dayjs(timestamp).format('HH:mm:ss');
+  }
+
+  displayDuration(duration: number) {
+    const seconds = Math.floor((duration / 1000) % 60);
+    const minutes = Math.floor((duration / (1000 * 60)) % 60);
+    const hours = Math.floor(duration / (1000 * 60 * 60));
+
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
   }
 
 }
