@@ -21,6 +21,13 @@
         </ng-container>
       </div>
 
+      <ng-container *ngIf="playing && playingSegmentIndex === segmentIndex">
+        <div class="progress mb-3" role="progressbar" >
+          <!-- https://stackoverflow.com/a/36773709 -->
+          <div class="progress-bar" [style.width]="playProgress+'%'" [style.transition-duration]="'150ms'"></div>
+        </div>
+      </ng-container>
+
     </li>
   </ng-container>
 </ul>

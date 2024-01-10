@@ -2,6 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {Piano} from "@tonejs/piano";
 import {MessageDto} from "../models/api/message-dto";
 import {Message} from "webmidi3";
+import {Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,9 @@ export class PlaybackService implements OnDestroy {
   });
   private scheduledMessageTimeouts: number[] = [];
   private _playing = false;
+
+  private progressUpdatesInterval: number = 0;
+  public progressUpdates: Subject<number>= new Subject<number>();
 
   constructor() { }
 
@@ -31,17 +35,24 @@ export class PlaybackService implements OnDestroy {
   public async playMessages(messages: MessageDto[]): Promise<void> {
     await this.loadPiano();
 
-    const playStart = messages[0].timestamp;
+    const playStart = Date.now();
+    const firstTimestamp = messages[0].timestamp;
+    const lastTimestamp = messages[messages.length - 1].timestamp
     this._playing = true;
 
-    let finalTimeoutDelay = playStart;
+    let finalTimeoutDelay = firstTimestamp;
     for (let message of messages) {
-      const timeoutDelay = message.timestamp - playStart;
+      const timeoutDelay = message.timestamp - firstTimestamp;
       finalTimeoutDelay = timeoutDelay;
       this.scheduledMessageTimeouts.push(window.setTimeout(() => {
         this.playMessage(message)
       }, timeoutDelay))
     }
+
+    const duration = lastTimestamp - firstTimestamp;
+    this.progressUpdatesInterval = window.setInterval(() => {
+      this.progressUpdates.next(((Date.now() - playStart) / duration) * 100);
+    }, 100)
 
     this.scheduledMessageTimeouts.push(window.setTimeout(() => {
       this.stopPlayingMessages();
@@ -51,6 +62,8 @@ export class PlaybackService implements OnDestroy {
   public stopPlayingMessages(): void {
     if (this._playing) {
       this.clearScheduledMessageTimeouts();
+      window.clearInterval(this.progressUpdatesInterval);
+      this.progressUpdates.next(0);
       this.piano.stopAll();
       this._playing = false;
     }

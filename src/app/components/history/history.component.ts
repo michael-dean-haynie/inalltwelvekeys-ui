@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MessageClientService} from "../../services/clients/message-client.service";
 import {Subscription} from "rxjs";
 import {DatePickerComponent} from "ng2-date-picker";
@@ -11,7 +11,7 @@ import {PlaybackService} from "../../services/playback.service";
   templateUrl: './history.component.html',
   styleUrls: ['./history.component.scss']
 })
-export class HistoryComponent implements OnDestroy, AfterViewInit {
+export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('dayPicker') datePicker!: DatePickerComponent;
 
   private subscriptions: Subscription[] = [];
@@ -19,11 +19,18 @@ export class HistoryComponent implements OnDestroy, AfterViewInit {
   public segments: Segment[] = [];
   public playingSegmentIndex = 0;
   public gapSize = 10;
+  public playProgress: number = 0;
 
   constructor(
     private messageClient: MessageClientService,
     private playbackService: PlaybackService
   ) {}
+
+  ngOnInit(): void {
+    this.subscriptions.push(this.playbackService.progressUpdates.subscribe(pctg => {
+      this.playProgress = pctg;
+    }));
+  }
 
   ngAfterViewInit(): void {
     const today = dayjs(Date.now()).startOf('day')

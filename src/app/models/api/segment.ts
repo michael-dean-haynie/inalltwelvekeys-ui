@@ -7,5 +7,5 @@ export interface Segment {
   segEndId: number,
   segEndTimestamp: number,
   segDuration: number,
-  keystrokes: number,
+  keystrokes: number
 }
