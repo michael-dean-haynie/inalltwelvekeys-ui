@@ -5,6 +5,7 @@ import {DatePickerComponent} from "ng2-date-picker";
 import * as dayjs from 'dayjs'
 import {Segment} from "../../models/api/segment";
 import {PlaybackService} from "../../services/playback.service";
+import {MessageDto} from "../../models/api/message-dto";
 
 @Component({
   selector: 'app-history',
@@ -59,8 +60,8 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     console.log('end', end);
 
     this.subscriptions.push(this.messageClient.getSegments(start, end, this.gapSize).subscribe(sgmts  => {
-      console.log('segments', sgmts);
       this.segments = sgmts;
+
     }));
   }
 

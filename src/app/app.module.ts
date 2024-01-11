@@ -16,7 +16,10 @@ import { ChordDetectorComponent } from './components/chord-detector/chord-detect
 import { ToastComponent } from './components/toast/toast.component';
 import { MidiTestComponent } from './components/midi-test/midi-test.component';
 import { HistoryComponent } from './components/history/history.component'
-import {DpDatePickerModule} from 'ng2-date-picker';;
+import {DpDatePickerModule} from 'ng2-date-picker';
+import {WaveformComponent} from "./components/waveform/waveform.component";
+
+;
 
 @NgModule({
   declarations: [
@@ -38,7 +41,8 @@ import {DpDatePickerModule} from 'ng2-date-picker';;
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    DpDatePickerModule
+    DpDatePickerModule,
+    WaveformComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

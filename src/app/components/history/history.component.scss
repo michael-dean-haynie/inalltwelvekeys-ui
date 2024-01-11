@@ -2,3 +2,9 @@
   display: flex;
   justify-content: space-between;
 }
+
+// Temporary hardcoded width to match hardcoded width of canvas waveform
+.pgb-ctr {
+  width: 600px;
+}
+ 

@@ -22,11 +22,14 @@
       </div>
 
       <ng-container *ngIf="playing && playingSegmentIndex === segmentIndex">
-        <div class="progress mb-3" role="progressbar" >
-          <!-- https://stackoverflow.com/a/36773709 -->
-          <div class="progress-bar" [style.width]="playProgress+'%'" [style.transition-duration]="'150ms'"></div>
+        <div class="pgb-ctr">
+          <div class="progress mb-3" role="progressbar">
+            <!-- https://stackoverflow.com/a/36773709 -->
+            <div class="progress-bar" [style.width]="playProgress+'%'" [style.transition-duration]="'150ms'"></div>
+          </div>
         </div>
       </ng-container>
+      <app-waveform [timestampRange]="{ start: segment.segStartTimestamp, end: segment.segEndTimestamp }"></app-waveform>
 
     </li>
   </ng-container>
