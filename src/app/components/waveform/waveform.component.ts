@@ -82,7 +82,7 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
     const barMagnitudes = wfPiano.simulateWaveForm(this.msgDtos);
     console.log(barMagnitudes);
 
-    const barPxWidth = this.canvasWidth / this.noOfBars;
+    const barPxWidth = this.canvasWidth / wfPiano.configuration.barCount;
     for (const [index, barMagnitude] of barMagnitudes.entries()) {
       this.ctx.fillStyle = "rgb(200, 0, 0)";
       this.ctx.fillRect(index * barPxWidth, 0, barPxWidth, barMagnitude * this.canvasHeight);

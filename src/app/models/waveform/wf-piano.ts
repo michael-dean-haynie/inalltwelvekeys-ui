@@ -55,9 +55,13 @@ export class WFPiano {
 
   }
 
+  public get configuration(): WFPianoOptions {
+    return this.options;
+  }
+
   public static getDefaultOptions(): WFPianoOptions {
     return {
-      barCount: 200,
+      barCount: 100,
       multipleNoteVolumeBackoff: .55,
       ...WFString.getDefaultOptions()
     };
