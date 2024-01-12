@@ -56,9 +56,6 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     endDate.setDate(new Date(start).getDate() + 1);
     const end = endDate.toISOString();
 
-    console.log('start', start);
-    console.log('end', end);
-
     this.subscriptions.push(this.messageClient.getSegments(start, end, this.gapSize).subscribe(sgmts  => {
       this.segments = sgmts;
 
@@ -72,7 +69,6 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.push(
       this.messageClient.getSegment(segment.segStartTimestamp, segment.segEndTimestamp)
         .subscribe(async (msgs)  => {
-          console.log('messages', msgs);
           await this.playbackService.playMessages(msgs);
     }));
   }

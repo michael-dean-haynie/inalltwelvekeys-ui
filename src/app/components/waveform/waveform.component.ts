@@ -14,6 +14,7 @@ import {TimestampRange} from "../../models/timestamp-range";
 import {MessageClientService} from "../../services/clients/message-client.service";
 import {Subscription} from "rxjs";
 import {Message} from "webmidi3";
+import {WFPiano} from "../../models/waveform/wf-piano";
 
 @Component({
   selector: 'app-waveform',
@@ -40,7 +41,10 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   // number of bars to display (width wise) on the wave form
-  private noOfBars = 100;
+  private noOfBars = 200;
+
+  // multiply a keystroke's velocity (0-1) by this to get the magnitude (0-1) it adds to the waveform
+  private velocityToMagnitudeMultiplier = 0.25;
 
   constructor(private messageClient: MessageClientService) {
   }
@@ -62,12 +66,6 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
       throw new Error('unable to get canvas context');
     }
     this.ctx = contextResult;
-
-    // this.ctx.fillStyle = "rgb(200, 0, 0)";
-    // this.ctx.fillRect(10, 10, 50, 50);
-    //
-    // this.ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-    // this.ctx.fillRect(30, 30, 50, 50);
   }
 
   public ngOnDestroy(): void {
@@ -80,23 +78,14 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
     if (!this.timestampRange) {
       throw new Error('timestampRange is falsy');
     }
-
-    const duration = this.timestampRange.end - this.timestampRange.start;
-    const barMsWidth = duration / this.noOfBars;
-    const barMagnitudes = new Array(100).fill(0);
-    for (let msgDto of this.msgDtos) {
-      const wmMsg = new Message(new Uint8Array([msgDto.byte1, msgDto.byte2, msgDto.byte3]));
-      if (wmMsg.type === 'noteon'){
-        const msFromStart = msgDto.timestamp - this.timestampRange.start;
-        const barIndex = Math.floor((msFromStart / duration) * 100);
-        barMagnitudes[barIndex]++;
-      }
-    }
+    const wfPiano = new WFPiano();
+    const barMagnitudes = wfPiano.simulateWaveForm(this.msgDtos);
+    console.log(barMagnitudes);
 
     const barPxWidth = this.canvasWidth / this.noOfBars;
     for (const [index, barMagnitude] of barMagnitudes.entries()) {
       this.ctx.fillStyle = "rgb(200, 0, 0)";
-      this.ctx.fillRect(index * barPxWidth, 0, barPxWidth, barMagnitude * 10);
+      this.ctx.fillRect(index * barPxWidth, 0, barPxWidth, barMagnitude * this.canvasHeight);
     }
 
   }
