@@ -79,9 +79,6 @@ export class WFCanvasSample {
       const isAboveAxis = y < this.pm.top;
       if (isAboveAxis) {
         const sampleIndex = Math.floor(x / this.pm.sample);
-        // const sampleMagnitude = this.magnitudes[sampleIndex];
-        // const isAboveMagnitude = y < (this.pm.top - Math.floor(sampleMagnitude * this.pm.top));
-        // const isHovering = isAboveAxis && !isAboveMagnitude;
         const thisSampleIsBeforeHover = this.index <= sampleIndex;
 
         newHoverState = thisSampleIsBeforeHover ? 'before' : 'after';

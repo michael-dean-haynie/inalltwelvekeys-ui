@@ -110,7 +110,7 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   }
 
-  public canvasClicked(event: MouseEvent) {
+  public canvasClicked(mouseEvent: MouseEvent) {
     if (!this.playing){
       this.playbackProgressSubscription = this.playbackService.playMessages(this.msgDtos).subscribe({
         next: (progress) => {
@@ -133,6 +133,7 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
       this.cvFacade.onPlayStateChange('play');
     }
     else if (this.playing) {
+      // stop what's currently playing
       this.playbackProgressSubscription.unsubscribe();
       this.playing = false;
       this.cvFacade.onPlayStateChange('pause');
@@ -141,10 +142,6 @@ export class WaveformComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   public mouseMoved(mouseEvent: MouseEvent) {
     this.cvFacade.onHoverChange(mouseEvent);
-    // const rect = this.canvas.nativeElement.getBoundingClientRect()
-    // const x = event.clientX - rect.left
-    // const y = event.clientY - rect.top
-    // console.log("x: " + x + " y: " + y)
   }
 
 }

@@ -115,42 +115,57 @@ export class WFCanvasFacade {
     }
   }
 
-  public paint(mags: number[], playProgress: number): void {
-    const playIndex = this.getSampleIndexByProgress(playProgress);
-    for(const [index, mag] of mags.entries()) {
-      if (playProgress === 0 || index > playIndex) {
-        this.paintHalfBar(index, mag, 'rgb(255, 255, 255)', 'top');
-        this.paintHalfBar(index, mag, 'rgb(228, 228, 228)', 'bottom');
-      }
-      else if (index === playIndex) {
-        this.paintHalfBar(index, mag, 'rgb(255, 84, 0)', 'top');
-        this.paintHalfBar(index, mag, 'rgb(255, 191, 153)', 'bottom');
-      }
-      else if (index < playIndex) {
-        this.paintHalfBar(index, mag, 'rgb(255, 84, 0)', 'top');
-        this.paintHalfBar(index, mag, 'rgb(255, 191, 153)', 'bottom');
-      }
-
-    }
+  public getClickedSampleIndex(mouseEvent: MouseEvent): number {
+    const rect = this.canvas.getBoundingClientRect()
+    const x = mouseEvent.clientX - rect.left
+    const y = mouseEvent.clientY - rect.top
+    return Math.floor(x / this.pm.sample);
   }
 
-  public paintHalfBar(index: number, magnitude: number, style: FillStyle, half: 'top' | 'bottom' = 'top'): void {
-    this.ctx.fillStyle = style;
-
-    // assuming bottom
-    const xOffset = (this.pm.sample * index) + (this.pm.barGap / 2);
-    let yOffset = this.height - this.pm.bottom;
-    const width = this.pm.bar;
-    let height = Math.floor(magnitude * this.pm.bottom);
-
-    // adjust if top
-    if (half === 'top') {
-      yOffset = this.pm.top;
-      height = Math.floor(magnitude * this.pm.top) * -1;
-    }
-
-    this.ctx.fillRect(xOffset, yOffset, width, height);
+  public sampleWasClicked(mouseEvent: MouseEvent): boolean {
+    const rect = this.canvas.getBoundingClientRect()
+    const x = mouseEvent.clientX - rect.left
+    const y = mouseEvent.clientY - rect.top
+    const isAboveAxis = y < this.pm.top;
+    return isAboveAxis;
   }
+
+  // public paint(mags: number[], playProgress: number): void {
+  //   const playIndex = this.getSampleIndexByProgress(playProgress);
+  //   for(const [index, mag] of mags.entries()) {
+  //     if (playProgress === 0 || index > playIndex) {
+  //       this.paintHalfBar(index, mag, 'rgb(255, 255, 255)', 'top');
+  //       this.paintHalfBar(index, mag, 'rgb(228, 228, 228)', 'bottom');
+  //     }
+  //     else if (index === playIndex) {
+  //       this.paintHalfBar(index, mag, 'rgb(255, 84, 0)', 'top');
+  //       this.paintHalfBar(index, mag, 'rgb(255, 191, 153)', 'bottom');
+  //     }
+  //     else if (index < playIndex) {
+  //       this.paintHalfBar(index, mag, 'rgb(255, 84, 0)', 'top');
+  //       this.paintHalfBar(index, mag, 'rgb(255, 191, 153)', 'bottom');
+  //     }
+  //
+  //   }
+  // }
+
+  // public paintHalfBar(index: number, magnitude: number, style: FillStyle, half: 'top' | 'bottom' = 'top'): void {
+  //   this.ctx.fillStyle = style;
+  //
+  //   // assuming bottom
+  //   const xOffset = (this.pm.sample * index) + (this.pm.barGap / 2);
+  //   let yOffset = this.height - this.pm.bottom;
+  //   const width = this.pm.bar;
+  //   let height = Math.floor(magnitude * this.pm.bottom);
+  //
+  //   // adjust if top
+  //   if (half === 'top') {
+  //     yOffset = this.pm.top;
+  //     height = Math.floor(magnitude * this.pm.top) * -1;
+  //   }
+  //
+  //   this.ctx.fillRect(xOffset, yOffset, width, height);
+  // }
 
   private getSampleIndexByProgress(progress: number): number {
     return Math.floor(this.sampleCount * progress);
