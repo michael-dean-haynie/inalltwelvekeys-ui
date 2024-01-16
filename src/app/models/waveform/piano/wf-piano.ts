@@ -1,5 +1,5 @@
 import {WFString, WFStringOptions} from "./wf-string";
-import {MessageDto} from "../api/message-dto";
+import {MessageDto} from "../../api/message-dto";
 import {Message} from "webmidi3";
 import {WFPedal} from "./wf-pedal";
 
@@ -67,7 +67,10 @@ export class WFPiano {
     };
   }
 
-  public simulateWaveForm(msgDtos: MessageDto[]): number[] {
+  public simulateWaveForm(msgDtos: MessageDto[], barCount?: number): number[] {
+    const existingBarCount = this.options.barCount;
+    this.options.barCount = barCount || existingBarCount;
+
     if (!msgDtos || !msgDtos.length) {
       return [];
     }
@@ -88,6 +91,7 @@ export class WFPiano {
       barMagnitudes[barIndex] = this.getMagnitude();
     }
 
+    this.options.barCount = existingBarCount;
     return barMagnitudes;
   }
 

@@ -2,7 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {Piano} from "@tonejs/piano";
 import {MessageDto} from "../models/api/message-dto";
 import {Message} from "webmidi3";
-import {Subject} from "rxjs";
+import {from, map, Observable, of, Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class PlaybackService implements OnDestroy {
   private _playing = false;
 
   private progressUpdatesInterval: number = 0;
-  public progressUpdates: Subject<number>= new Subject<number>();
+  // public progressUpdates: Subject<number>= new Subject<number>();
 
   constructor() { }
 
@@ -32,38 +32,52 @@ export class PlaybackService implements OnDestroy {
     return this._playing;
   }
 
-  public async playMessages(messages: MessageDto[]): Promise<void> {
-    await this.loadPiano();
+  public playMessages(messages: MessageDto[]): Observable<number> {
+    return new Observable<number>((subscriber) => {
+      this.loadPiano().then(() => {
+        this.stopPlayingMessages();
 
-    const playStart = Date.now();
-    const firstTimestamp = messages[0].timestamp;
-    const lastTimestamp = messages[messages.length - 1].timestamp
-    this._playing = true;
+        const playStart = Date.now();
+        const firstTimestamp = messages[0].timestamp;
+        const lastTimestamp = messages[messages.length - 1].timestamp
+        this._playing = true;
 
-    let finalTimeoutDelay = firstTimestamp;
-    for (let message of messages) {
-      const timeoutDelay = message.timestamp - firstTimestamp;
-      finalTimeoutDelay = timeoutDelay;
-      this.scheduledMessageTimeouts.push(window.setTimeout(() => {
-        this.playMessage(message)
-      }, timeoutDelay))
-    }
+        let finalTimeoutDelay = firstTimestamp;
+        for (let message of messages) {
+          const timeoutDelay = message.timestamp - firstTimestamp;
+          finalTimeoutDelay = timeoutDelay;
+          this.scheduledMessageTimeouts.push(window.setTimeout(() => {
+            this.playMessage(message)
+          }, timeoutDelay))
+        }
 
-    const duration = lastTimestamp - firstTimestamp;
-    this.progressUpdatesInterval = window.setInterval(() => {
-      this.progressUpdates.next(((Date.now() - playStart) / duration) * 100);
-    }, 100)
+        const duration = lastTimestamp - firstTimestamp;
+        this.progressUpdatesInterval = window.setInterval(() => {
+          const progress = (Date.now() - playStart) / duration;
+          if (progress < 1) {
+            subscriber.next(progress);
+          }
+          else {
+            subscriber.next(1);
+            subscriber.next(0);
+            this.stopPlayingMessages();
+          }
+        }, 50)
 
-    this.scheduledMessageTimeouts.push(window.setTimeout(() => {
-      this.stopPlayingMessages();
-    }, finalTimeoutDelay))
+      });
+
+      const thiz = this;
+      return function unsubscribe() {
+        thiz.stopPlayingMessages();
+      };
+    });
   }
 
   public stopPlayingMessages(): void {
     if (this._playing) {
       this.clearScheduledMessageTimeouts();
       window.clearInterval(this.progressUpdatesInterval);
-      this.progressUpdates.next(0);
+
       this.piano.stopAll();
       this._playing = false;
     }

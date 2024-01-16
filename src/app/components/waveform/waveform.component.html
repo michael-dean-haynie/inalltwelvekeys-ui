@@ -1,1 +1,8 @@
-<canvas #wfCanvas [width]="canvasWidth" [height]="canvasHeight"></canvas>
+<canvas #wfCanvas
+        height="150"
+        width="600"
+        (mousemove)="mouseMoved($event)"
+        (mouseenter)="mouseMoved($event)"
+        (mouseleave)="mouseMoved($event)"
+        (mousedown)="canvasClicked($event)"
+></canvas>
