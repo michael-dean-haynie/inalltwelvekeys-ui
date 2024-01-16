@@ -36,8 +36,8 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {
     const today = dayjs(Date.now()).startOf('day')
     const devDay = dayjs(new Date('01-07-2024')).startOf('day'); // day with dev data
-    // this.datePicker.writeValue(today);
-    this.datePicker.writeValue(devDay);
+    this.datePicker.writeValue(today);
+    // this.datePicker.writeValue(devDay);
     // TODO: revert for prod
   }
 
