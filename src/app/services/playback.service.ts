@@ -2,7 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {Piano} from "@tonejs/piano";
 import {MessageDto} from "../models/api/message-dto";
 import {Message} from "webmidi3";
-import {from, map, Observable, of, Subject} from "rxjs";
+import {first, from, map, Observable, of, Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,6 @@ export class PlaybackService implements OnDestroy {
   private _playing = false;
 
   private progressUpdatesInterval: number = 0;
-  // public progressUpdates: Subject<number>= new Subject<number>();
 
   constructor() { }
 
@@ -32,37 +31,52 @@ export class PlaybackService implements OnDestroy {
     return this._playing;
   }
 
-  public playMessages(messages: MessageDto[]): Observable<number> {
+  public playMessages(totalMessages: MessageDto[], startFromProgressPoint: number = 0): Observable<number> {
     return new Observable<number>((subscriber) => {
       this.loadPiano().then(() => {
         this.stopPlayingMessages();
 
-        const playStart = Date.now();
-        const firstTimestamp = messages[0].timestamp;
-        const lastTimestamp = messages[messages.length - 1].timestamp
-        this._playing = true;
 
-        let finalTimeoutDelay = firstTimestamp;
-        for (let message of messages) {
-          const timeoutDelay = message.timestamp - firstTimestamp;
+        const firstTimestamp = totalMessages[0].timestamp;
+        const lastTimestamp = totalMessages[totalMessages.length - 1].timestamp
+        const totalDuration = lastTimestamp - firstTimestamp;
+
+        const msToStartPlayingFrom = (totalDuration * startFromProgressPoint);
+        let indexOfFirstMessageToPlay = 0;
+        for (let i = 0; i < totalMessages.length; i++) {
+          const msAfterFirst = totalMessages[i].timestamp - firstTimestamp;
+          if (msAfterFirst >= msToStartPlayingFrom) {
+            indexOfFirstMessageToPlay = i;
+            break;
+          }
+        }
+
+        const messagesToPlay = totalMessages.slice(indexOfFirstMessageToPlay)
+        const firstTsToPlay = messagesToPlay[0].timestamp;
+
+        let finalTimeoutDelay = firstTsToPlay;
+        for (let message of messagesToPlay) {
+          const timeoutDelay = message.timestamp - firstTsToPlay;
           finalTimeoutDelay = timeoutDelay;
           this.scheduledMessageTimeouts.push(window.setTimeout(() => {
             this.playMessage(message)
           }, timeoutDelay))
         }
 
-        const duration = lastTimestamp - firstTimestamp;
+        const playStart = Date.now();
+        this._playing = true;
+
         this.progressUpdatesInterval = window.setInterval(() => {
-          const progress = (Date.now() - playStart) / duration;
+          const progress = (Date.now() - (playStart - msToStartPlayingFrom)) / totalDuration;
           if (progress < 1) {
             subscriber.next(progress);
           }
           else {
-            subscriber.next(1);
-            subscriber.next(0);
+            subscriber.next(1); // complete
+            subscriber.next(0); // reset
             this.stopPlayingMessages();
           }
-        }, 50)
+        }, 100)
 
       });
 

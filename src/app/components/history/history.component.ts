@@ -27,11 +27,7 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     private playbackService: PlaybackService
   ) {}
 
-  ngOnInit(): void {
-    // this.subscriptions.push(this.playbackService.progressUpdates.subscribe(pctg => {
-    //   this.playProgress = pctg;
-    // }));
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     const today = dayjs(Date.now()).startOf('day')

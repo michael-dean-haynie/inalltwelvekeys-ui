@@ -122,12 +122,20 @@ export class WFCanvasFacade {
     return Math.floor(x / this.pm.sample);
   }
 
+  public getClickedProgress(mouseEvent: MouseEvent): number {
+    const rect = this.canvas.getBoundingClientRect()
+    const x = mouseEvent.clientX - rect.left
+    const y = mouseEvent.clientY - rect.top
+    return x / (this.pm.width - this.pm.excess)
+  }
+
   public sampleWasClicked(mouseEvent: MouseEvent): boolean {
     const rect = this.canvas.getBoundingClientRect()
     const x = mouseEvent.clientX - rect.left
     const y = mouseEvent.clientY - rect.top
     const isAboveAxis = y < this.pm.top;
-    return isAboveAxis;
+    const isOverExcessSpace = y > this.pm.width - this.pm.excess;
+    return isAboveAxis && !isOverExcessSpace;
   }
 
   // public paint(mags: number[], playProgress: number): void {
