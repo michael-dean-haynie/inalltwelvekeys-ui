@@ -1,7 +1,7 @@
 import {AfterViewChecked, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
-import {ExerciseService} from "../../services/exercise.service";
+import {ExerciseClientService} from "../../services/clients/exercise-client.service";
 import {Exercise} from "../../models/api/exercise";
 import { v4 as uuidv4 } from "uuid";
 import {Interval, RomanNumeral, ScaleType, Tonal} from "tonal";
@@ -33,7 +33,7 @@ export class ExerciseEditComponent implements OnInit, OnDestroy, AfterViewChecke
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private exerciseService: ExerciseService,
+    private exerciseService: ExerciseClientService,
     private scaleGeneratorService: ScaleGeneratorService,
     private fb: FormBuilder
   ) {}

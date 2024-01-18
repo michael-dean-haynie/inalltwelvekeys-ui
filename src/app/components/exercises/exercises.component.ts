@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ExerciseService} from "../../services/exercise.service";
+import {ExerciseClientService} from "../../services/clients/exercise-client.service";
 import {Exercise} from "../../models/api/exercise";
 import {Subscription} from "rxjs";
 
@@ -12,7 +12,7 @@ export class ExercisesComponent implements OnInit, OnDestroy{
   exercises: Exercise[] = [];
   private subscriptions: Subscription[] = [];
 
-  constructor(private exerciseService: ExerciseService) {}
+  constructor(private exerciseService: ExerciseClientService) {}
 
   ngOnInit(): void {
     this.subscriptions.push(this.exerciseService.list().subscribe(result => {

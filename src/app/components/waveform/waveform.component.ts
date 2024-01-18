@@ -13,7 +13,7 @@ import {TimestampRange} from "../../models/timestamp-range";
 import {MessageClientService} from "../../services/clients/message-client.service";
 import {Subscription} from "rxjs";
 import {PlaybackService} from "../../services/playback.service";
-import {WFCanvasFacade} from "../../models/waveform/facade/wf-canvas-facade";
+import {WFCanvasFacade} from "../../helpers/waveform/facade/wf-canvas-facade";
 
 @Component({
   selector: 'app-waveform',

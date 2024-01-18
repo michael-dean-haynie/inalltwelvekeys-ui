@@ -1,5 +1,5 @@
 import {WFString, WFStringOptions} from "./wf-string";
-import {MessageDto} from "../../api/message-dto";
+import {MessageDto} from "../../../models/api/message-dto";
 import {Message} from "webmidi3";
 import {WFPedal} from "./wf-pedal";
 

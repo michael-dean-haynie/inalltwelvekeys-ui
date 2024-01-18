@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {ExerciseService} from "../../services/exercise.service";
+import {ExerciseClientService} from "../../services/clients/exercise-client.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Exercise} from "../../models/api/exercise";
 import {shuffleAlgo} from "../../utilities/math-utilities";
@@ -26,7 +26,7 @@ export class ExerciseComponent implements OnInit, OnDestroy{
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private exerciseService: ExerciseService,
+    private exerciseService: ExerciseClientService,
     private activeNotesService: ActiveNotesService,
     private ref: ChangeDetectorRef
   ) {
