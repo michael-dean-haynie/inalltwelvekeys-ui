@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ExerciseService } from './exercise.service';
 import {RomanNumeral} from "tonal";
 
-fdescribe('ExerciseService', () => {
+describe('ExerciseService', () => {
   let service: ExerciseService;
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ fdescribe('ExerciseService', () => {
   });
 
 
-  fdescribe('getHashCode', () => {
+  describe('getHashCode', () => {
     it('should return the same code for meaningfully identical models', () => {
       // Act
       const hash1 = service.getHashCode({
