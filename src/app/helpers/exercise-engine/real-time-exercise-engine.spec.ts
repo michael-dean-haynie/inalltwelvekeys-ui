@@ -1,6 +1,6 @@
 import {RealTimeExerciseEngine} from "./real-time-exercise-engine";
 
-fdescribe('RealTimeExerciseEngine', () => {
+describe('RealTimeExerciseEngine', () => {
 
   beforeEach(() => {
   });

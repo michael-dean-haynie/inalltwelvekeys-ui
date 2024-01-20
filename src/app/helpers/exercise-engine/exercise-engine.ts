@@ -3,6 +3,7 @@ import {Message} from "webmidi3";
 import {Note, Progression} from "tonal";
 import {ExerciseBeat} from "../../models/api/exercise-beat";
 import {ExerciseEventType} from "../../models/api/exercise-event";
+import * as ba from "./beat-analyzers";
 
 export abstract class ExerciseEngine {
 
@@ -54,8 +55,14 @@ export abstract class ExerciseEngine {
 
   protected processMessage(message: Message, msOffset: number): void {
     this.msSinceStartOfExercise = msOffset;
+
+    const previousFreshNoteCount = this.freshNotes.size;
     this.updateNoteSets(message);
-    this.checkNotesAgainstCurrentBeat();
+
+    // only need to analyze notes if fresh notes changed
+    if (this.freshNotes.size !== previousFreshNoteCount) {
+      this.analyzeNotes();
+    }
   }
 
   protected processEvent(eventType: ExerciseEventType, msOffset: number): void {
@@ -80,48 +87,19 @@ export abstract class ExerciseEngine {
     return this.exercise.beats[this._beatIndex];
   }
 
-  private checkNotesAgainstCurrentBeat(): void {
-    let notesMatchCurrentBeat = false;
+  private analyzeNotes(): void {
+    let notesSatisfyBeat = false;
 
-    // get the chord root for the current beat (in the current key)
-    const chordRoot = Progression.fromRomanNumerals(this.currentKey, [this.currentBeat.chordRomanNumeral])[0];
+    const wrongNotes = [...this.freshNotes]
+      .filter(note => !ba.beatVoicingChromasIncludeNoteChroma(this.currentKey, this.currentBeat, note))
 
-    // get the bass note defined in the current beat's chord voicing
-    const voicingBassNote = Note.transpose(chordRoot, this.currentBeat.chordVoicing[0]);
-
-    // get all played/fresh notes that could be the bass
-    const notesThatMatchBassNote = [...this.freshNotes]
-      .map(Note.fromMidi)
-      .map(Note.get)
-      .filter(note => note.chroma === Note.get(voicingBassNote).chroma);
-
-    // check if there are any bass note matches that also have the rest of the chord voicing members at correct intervals
-    if (notesThatMatchBassNote.length) {
-      notesMatchCurrentBeat = notesThatMatchBassNote.some(bassNoteMatch => {
-        const nonBassMemberIntervals = this.currentBeat.chordVoicing.slice(1);
-
-        if (!nonBassMemberIntervals.length) {
-          return true; // bass note was the only chord member
-        }
-
-        const bassInterval = this.currentBeat.chordVoicing[0];
-
-        const rootImmediatelyBelowBass = Note.transpose(
-          bassNoteMatch.name,
-          `-${bassInterval}`);
-
-        const nonBassMemberNotes = nonBassMemberIntervals
-          .map(interval => Note.transpose(rootImmediatelyBelowBass, interval));
-
-        const nonBassMemberMidis = nonBassMemberNotes
-          .map(note => Note.get(note).midi || -1);
-
-        return nonBassMemberMidis
-          .every(midi => [...this.freshNotes].includes(midi));
-      });
+    if (wrongNotes.length) {
+      console.log('WRONG NOTES!', wrongNotes.map(note => Note.fromMidi(note)));
+    } else {
+      notesSatisfyBeat = ba.notesSatisfyBeat(this.currentKey, this.currentBeat, [...this.freshNotes]);
     }
 
-    if (notesMatchCurrentBeat) {
+    if (notesSatisfyBeat) {
       this.progressToNextBeat();
     }
   }
@@ -205,43 +183,3 @@ export abstract class ExerciseEngine {
     return message.data[1]; // second of 3 bytes has midi number
   }
 }
-
-/**
- * What are the inputs and outputs for this?
- *
- * -------------------------------------------------------
- * INPUTS:
- * The real-time engine will be initialized with:
- *  - the exercise
- *  - the key sequence
- *
- *  ... and then in real time it will receive
- *  - midi inputs from the user
- *  - forward/backward commands from the user
- *
- *  The simulating engine will be initialized with:
- *  - the exercise
- *  - the key sequence
- *  - the recorded midi events from the user
- *  - the recorded forward/backward commands from the user
- *
- *
- * -------------------------------------------------------
- *  OUTPUTS:
- *  The real-time engine needs to drive the ui in real time:
- *  - show progress for the beats sequence and the keys sequence
- *  - show the next prompt when needed
- *  - make available all the breakdown/analytics data
- *
- *  The simulated engine just needs to execute and return the data
- *
- *  -------------------------------------------------
- *  Plan:
- *  I think I'll use inheritance for this.
- *  The realtime and simulated engines will extend the abstract engine.
- *  The abstract engine will do all the state-crunching in a temporally agnostic way
- *    - The realtime engine would feed the protected abstract methods realtime timestamps/offsets
- *    - The simulated engine would feed the same methods the recorded timestamps/offsets
- *
- *  The base class will be like a state machine that the derived classes can drive and interrogate however they need.
- */
