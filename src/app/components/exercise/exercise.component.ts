@@ -5,8 +5,10 @@ import {Exercise} from "../../models/api/exercise";
 import {shuffleAlgo} from "../../utilities/math-utilities";
 import {Subscription} from "rxjs";
 import {ActiveNotesService} from "../../services/active-notes.service";
-import {Note, Progression,} from "tonal";
+import {Note} from "tonal";
 import {ExerciseBeat} from "../../models/api/exercise-beat";
+import {MidiMessageService} from "../../services/midi-message.service";
+import {RealTimeExerciseEngine} from "../../helpers/exercise-engine/real-time-exercise-engine";
 
 @Component({
   selector: 'app-exercise',
@@ -14,49 +16,67 @@ import {ExerciseBeat} from "../../models/api/exercise-beat";
   styleUrls: ['./exercise.component.scss']
 })
 export class ExerciseComponent implements OnInit, OnDestroy{
-  keys: string[] = [];
-  keyIndex: number = 0;
-  beatIndex: number = 0;
-  complete: boolean = false;
+  public complete: boolean;
+
+  private keys: string[];
+  private readonly subscriptions: Subscription[];
+
   private _exercise: Exercise | undefined;
-  private subscriptions: Subscription[] = [];
-  // notes (pitch classes) that need to be released before they can match again
-  private chromasNeedingRelease: number[] = [];
+  private _engine?: RealTimeExerciseEngine;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private exerciseService: ExerciseClientService,
     private activeNotesService: ActiveNotesService,
+    private midiMessageService: MidiMessageService,
     private ref: ChangeDetectorRef
   ) {
+    this.complete = false;
     this.keys = this.getShuffledKeys();
+    this.subscriptions = [];
   }
 
-  get exercise(): Exercise {
+  public get exercise(): Exercise {
     if (!this._exercise) {
       throw new Error();
     }
     return this._exercise;
   }
 
-  get currentKey(): string {
+  public get currentKey(): string {
     return this.keys[this.keyIndex];
   }
 
-  get currentBeat(): ExerciseBeat {
+  public get currentBeat(): ExerciseBeat {
     return this.exercise.beats[this.beatIndex];
   }
 
-  get currentKeyProgressWidth(): string {
+  public get currentKeyProgressWidth(): string {
     const percentage = Math.floor((this.beatIndex / this.exercise.beats.length) * 100);
     return `${percentage}%`;
   }
 
-  get exerciseProgressWidth(): string {
+  public get exerciseProgressWidth(): string {
     const percentage = Math.floor((this.keyIndex / this.keys.length) * 100);
     return `${percentage}%`;
   }
+
+  private get engine(): RealTimeExerciseEngine {
+    if (!this._engine) {
+      throw new Error();
+    }
+    return this._engine;
+  }
+
+  private get keyIndex(): number {
+    return this.engine.keyIndex;
+  }
+
+  private get beatIndex(): number {
+    return this.engine.beatIndex;
+  }
+
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -76,13 +96,16 @@ export class ExerciseComponent implements OnInit, OnDestroy{
       }
     });
 
-    this.subscriptions.push(this.activeNotesService.activeNotesSubject.subscribe(activeNotes => {
-      this.handleActiveNotesChanges(activeNotes);
+    this.initNewEngine();
+    this.subscriptions.push(this.midiMessageService.midiMessageSubject.subscribe(tsMessage => {
+      // this.handleActiveNotesChanges(activeNotes);
+      this.engine.onMessage(tsMessage);
 
       // for some reason change detection not getting triggered automatically
       this.ref.markForCheck();
       this.ref.detectChanges();
     }));
+
   }
 
   ngOnDestroy(): void {
@@ -91,116 +114,21 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     }
   }
 
-  formatBeat(beat: ExerciseBeat): string {
+  public formatBeat(beat: ExerciseBeat): string {
     return `${beat.chordRomanNumeral}${beat.chordType || ''} (${beat.chordVoicing.join(' ')})`
   }
 
-  private handleActiveNotesChanges(activeNotes: number[]) {
-    this.chromasNeedingRelease = this.chromasNeedingRelease.filter(chroma => {
-      return activeNotes.map(note => Note.get(Note.fromMidi(note)).chroma)
-        .includes(chroma);
-    });
-    // only continue with active notes that do not need release
-    activeNotes = activeNotes.filter(note => {
-      const activeNoteChroma = Note.get(Note.fromMidi(note)).chroma;
-      if (activeNoteChroma === undefined) { throw new Error(); }
-      return !this.chromasNeedingRelease.includes(activeNoteChroma);
-    });
-
-    if (this.exercise.beats.length) {
-      let activeNotesMatchCurrentBeat = false;
-
-      // get the chord root for the current beat (in the current key)
-      const chordRoot = Progression.fromRomanNumerals(this.currentKey, [this.currentBeat.chordRomanNumeral])[0];
-      const voicingBassNote = Note.transpose(chordRoot, this.currentBeat.chordVoicing[0]);
-      const activeNotesThatMatchBassNote = activeNotes
-        .map(Note.fromMidi)
-        .map(Note.get)
-        .filter(activeNote => activeNote.chroma === Note.get(voicingBassNote).chroma);
-
-      // check if there are any bass note matches that also have the rest of the chord voicing members at correct intervals
-      if (activeNotesThatMatchBassNote.length) {
-        activeNotesMatchCurrentBeat = activeNotesThatMatchBassNote.some(bassNoteMatch => {
-          const nonBassMemberIntervals = this.currentBeat.chordVoicing.slice(1);
-          if (!nonBassMemberIntervals.length) {
-            return true; // bass note was the only chord member
-          }
-          const bassInterval = this.currentBeat.chordVoicing[0];
-          const rootImmediatelyBelowBass = Note.transpose(
-            bassNoteMatch.name,
-            `-${bassInterval}`);
-          const nonBassMemberNotes = nonBassMemberIntervals.map(interval => Note.transpose(rootImmediatelyBelowBass, interval));
-          const nonBassMemberMidis = nonBassMemberNotes
-            .map(note => Note.get(note).midi || -1);
-          return nonBassMemberMidis
-            .every(midi => activeNotes.includes(midi));
-        });
-      }
-
-      if (activeNotesMatchCurrentBeat) {
-        // update notes needing release
-        for (let note of activeNotes) {
-          const activeNoteChroma = Note.get(Note.fromMidi(note)).chroma;
-          if (activeNoteChroma === undefined) { throw new Error(); }
-          if (!this.chromasNeedingRelease.includes(activeNoteChroma)) {
-            this.chromasNeedingRelease.push(activeNoteChroma);
-          }
-        }
-
-        this.progress();
-      }
-    }
+  public regressKey(): void {
+    this.engine.onEvent('user selected previous key');
   }
 
-  progress(): void {
-    this.beatIndex++;
-
-    if (this.beatIndex >= this.exercise.beats.length) {
-      this.beatIndex = 0;
-      this.keyIndex++;
-
-      if (this.keyIndex >= this.keys.length) {
-        this.keyIndex = 0;
-        this.complete = true;
-      }
-    }
+  public progressKey(): void {
+    this.engine.onEvent('user selected next key');
   }
 
-  progressKey(): void {
-    const initialKeyIndex = this.keyIndex
-    while(this.keyIndex === initialKeyIndex) {
-      this.progress();
-    }
-  }
-
-  regress(): void {
-    this.beatIndex--;
-
-    if (this.beatIndex < 0) {
-      this.beatIndex = this.exercise.beats.length - 1;
-      this.keyIndex--;
-
-      if (this.keyIndex < 0) {
-        this.keyIndex = 0;
-        this.beatIndex = 0;
-      }
-    }
-  }
-
-  regressKey(): void {
-    if (this.keyIndex > 0){
-      const initialKeyIndex = this.keyIndex
-      while(this.keyIndex === initialKeyIndex) {
-        this.regress();
-      }
-      this.beatIndex = 0;
-    }
-  }
-
-  again(): void {
+  public again(): void {
     this.keys = this.getShuffledKeys();
-    this.keyIndex = 0;
-    this.beatIndex = 0;
+    this.initNewEngine();
     this.complete = false;
 
     // for some reason change detection not getting triggered automatically
@@ -230,5 +158,12 @@ export class ExerciseComponent implements OnInit, OnDestroy{
     }
 
     return false;
+  }
+
+  private initNewEngine(): void {
+    this._engine = new RealTimeExerciseEngine(this.exercise, this.keys);
+    this.engine.onComplete = () => {
+      this.complete = true;
+    };
   }
 }

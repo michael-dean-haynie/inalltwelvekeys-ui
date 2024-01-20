@@ -1,7 +1,7 @@
 export interface MidiMessage {
   bytes?: number[];
   type?: string;
-  time?: number;
+  timestamp?: number;
   note?: number;
   velocity?: number;
   channel?: number;

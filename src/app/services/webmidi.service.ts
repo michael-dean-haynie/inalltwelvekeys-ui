@@ -29,7 +29,6 @@ export class WebmidiService implements OnDestroy{
         timestamp: tsMsg.timestamp,
         bytes: [...tsMsg.message.rawData]
       };
-      console.log('payload', payload);
       websocketService.send(payload);
     }));
   }

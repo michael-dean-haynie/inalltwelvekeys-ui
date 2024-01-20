@@ -14,12 +14,12 @@ export class ActiveNotesService implements OnDestroy {
   constructor(
     private midiMessageService: MidiMessageService,
   ) {
-    this.subscriptions.push(this.midiMessageService.midiMessageSubject.subscribe(message => {
-      const midiNoteNumber = message.data[1];
-      if (message.type === 'noteon') {
+    this.subscriptions.push(this.midiMessageService.midiMessageSubject.subscribe(tsMessage => {
+      const midiNoteNumber = tsMessage.message.data[1];
+      if (tsMessage.message.type === 'noteon') {
         this.handleNoteOnMidiEvent(midiNoteNumber);
       }
-      if (message.type === 'noteoff') {
+      if (tsMessage.message.type === 'noteoff') {
         this.handleNoteOffMidiEvent(midiNoteNumber);
       }
     }));

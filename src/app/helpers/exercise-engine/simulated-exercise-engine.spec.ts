@@ -34,4 +34,36 @@ fdescribe('SimulatedExerciseEngine', () => {
 
     expect(true).toBeTruthy();
   });
+
+  fdescribe('sandbox', () => {
+
+    it('sandbox', () => {
+      class BaseFoo {
+        private _bar: number;
+
+        protected get bar(): number {
+          return this._bar;
+        }
+
+        constructor() {
+          this._bar = 0;
+        }
+      }
+
+      class Foo extends BaseFoo {
+        public override get bar(): number {
+          return super.bar;
+        }
+
+        constructor() {
+          super();
+        }
+      }
+
+      const foo = new Foo();
+      console.log(foo.bar);
+
+      expect(true).toBeTruthy();
+    });
+  });
 });

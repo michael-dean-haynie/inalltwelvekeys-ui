@@ -14,7 +14,6 @@ import {HttpClientModule} from "@angular/common/http";
 import { NavComponent } from './components/nav/nav.component';
 import { ChordDetectorComponent } from './components/chord-detector/chord-detector.component';
 import { ToastComponent } from './components/toast/toast.component';
-import { MidiTestComponent } from './components/midi-test/midi-test.component';
 import { HistoryComponent } from './components/history/history.component'
 import {DpDatePickerModule} from 'ng2-date-picker';
 import {WaveformComponent} from "./components/waveform/waveform.component";
@@ -33,7 +32,6 @@ import {WaveformComponent} from "./components/waveform/waveform.component";
     NavComponent,
     ChordDetectorComponent,
     ToastComponent,
-    MidiTestComponent,
     HistoryComponent
   ],
   imports: [

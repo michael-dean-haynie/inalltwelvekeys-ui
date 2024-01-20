@@ -2,14 +2,18 @@ import {Exercise} from "../../models/api/exercise";
 import {Message} from "webmidi3";
 import {Note, Progression} from "tonal";
 import {ExerciseBeat} from "../../models/api/exercise-beat";
+import {ExerciseEventType} from "../../models/api/exercise-event";
 
 export abstract class ExerciseEngine {
 
+  // a callback that will be executed when the exercise has completed
+  public onComplete: () => void;
+
   // index marking the current key being exercised
-  private keyIndex: number;
+  private _keyIndex: number;
 
   // index marking the current beat being exercised
-  private beatIndex: number;
+  private _beatIndex: number;
 
   // ms since the exercise was started
   private msSinceStartOfExercise: number;
@@ -28,14 +32,24 @@ export abstract class ExerciseEngine {
     protected readonly exercise: Exercise,
     protected readonly keySequence: string[]
   ) {
-    this.keyIndex = 0;
-    this.beatIndex = 0;
+    this._keyIndex = 0;
+    this._beatIndex = 0;
 
     this.msSinceStartOfExercise = 0;
 
     this.activeNotes = new Set<number>();
     this.expiredNotes = new Set<number>();
     this.freshNotes = new Set<number>();
+
+    this.onComplete = () => {}; // nothing by default;
+  }
+
+  public get keyIndex(): number {
+    return this._keyIndex;
+  }
+
+  public get beatIndex(): number {
+    return this._beatIndex;
   }
 
   protected processMessage(message: Message, msOffset: number): void {
@@ -44,12 +58,26 @@ export abstract class ExerciseEngine {
     this.checkNotesAgainstCurrentBeat();
   }
 
+  protected processEvent(eventType: ExerciseEventType, msOffset: number): void {
+    this.msSinceStartOfExercise = msOffset;
+    if (eventType === 'user selected previous key') {
+      this.regressToPreviousKey();
+    }
+    else if (eventType === 'user selected next key') {
+      this.progressToNextKey();
+    }
+  }
+
+  private complete(): void {
+    this.onComplete();
+  }
+
   private get currentKey(): string {
-    return this.keySequence[this.keyIndex];
+    return this.keySequence[this._keyIndex];
   }
 
   private get currentBeat(): ExerciseBeat {
-    return this.exercise.beats[this.beatIndex];
+    return this.exercise.beats[this._beatIndex];
   }
 
   private checkNotesAgainstCurrentBeat(): void {
@@ -94,9 +122,54 @@ export abstract class ExerciseEngine {
     }
 
     if (notesMatchCurrentBeat) {
-      // pu@ (maybe break this into smaller functions)
-      // progress (including marking active notes as expired)
-      // capture data for beat analytics
+      this.progressToNextBeat();
+    }
+  }
+
+  private progressToNextBeat(): void {
+    this.expireActiveNotes();
+    this._beatIndex++;
+
+    if (this._beatIndex >= this.exercise.beats.length) {
+      this._beatIndex = 0;
+      this._keyIndex++;
+
+      if (this._keyIndex >= this.keySequence.length) {
+        this._keyIndex = 0;
+        this.complete();
+      }
+    }
+  }
+
+  private progressToNextKey(): void {
+    const initialKeyIndex = this._keyIndex
+    while(this._keyIndex === initialKeyIndex) {
+      this.progressToNextBeat();
+    }
+  }
+
+  private regressToPreviousBeat(): void {
+    this.expireActiveNotes();
+    this._beatIndex--;
+
+    if (this._beatIndex < 0) {
+      this._beatIndex = this.exercise.beats.length - 1;
+      this._keyIndex--;
+
+      if (this._keyIndex < 0) {
+        this._keyIndex = 0;
+        this._beatIndex = 0;
+      }
+    }
+  }
+
+  private regressToPreviousKey(): void {
+    if (this._keyIndex > 0){
+      const initialKeyIndex = this._keyIndex
+      while(this._keyIndex === initialKeyIndex) {
+        this.regressToPreviousBeat();
+      }
+      this._beatIndex = 0;
     }
   }
 
@@ -119,6 +192,12 @@ export abstract class ExerciseEngine {
           this.freshNotes.add(noteNumber);
         }
       }
+    }
+  }
+
+  private expireActiveNotes(): void {
+    for (let noteNumber of this.activeNotes) {
+      this.expiredNotes.add(noteNumber);
     }
   }
 
