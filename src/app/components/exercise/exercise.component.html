@@ -36,10 +36,13 @@
 <div *ngIf="complete" class="complete-container mb-3 pt-3 border-top">
   <div>You completed the exercise!</div>
   <button type="button" class="btn btn-success" (click)="again()">Let's go again!</button>
+  <app-exercise-deetz [exerciseDeetz]="exerciseDeetz"></app-exercise-deetz>
 </div>
+
 <div class="sticky-bottom">
   <div class="sticky-bottom-contents py-3 bg-body border-top">
     <button type="button" class="btn btn-outline-primary">Configure Keys</button>
+    <button type="button" class="btn btn-outline-primary" (click)="finish()">Finish Exercise</button>
     <a routerLink="/exercise/edit/{{exercise.id}}" [queryParams]="{origin: 'exercise'}">
       <button type="button" class="btn btn-outline-primary">Edit Exercise</button>
     </a>

@@ -17,8 +17,7 @@ import { ToastComponent } from './components/toast/toast.component';
 import { HistoryComponent } from './components/history/history.component'
 import {DpDatePickerModule} from 'ng2-date-picker';
 import {WaveformComponent} from "./components/waveform/waveform.component";
-
-;
+import {ExerciseDeetzComponent} from "./components/exercise-deetz/exercise-deetz.component";
 
 @NgModule({
   declarations: [
@@ -32,7 +31,8 @@ import {WaveformComponent} from "./components/waveform/waveform.component";
     NavComponent,
     ChordDetectorComponent,
     ToastComponent,
-    HistoryComponent
+    HistoryComponent,
+    ExerciseDeetzComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,20 @@
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Key</th>
+      <ng-container *ngFor="let beat of exerciseDeetz.exercise.beats; index as beatIdx;">
+        <th scope="col">{{getBeatHeaderText(beatIdx)}}</th>
+      </ng-container>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-container *ngFor="let keyDeetz of exerciseDeetz.keyDeetz; index as keyDeetzIdx;">
+      <tr>
+        <th scope="row">{{keyDeetz.key}}</th>
+        <ng-container *ngFor="let beatDeetz of keyDeetz.beatDeetz; index as beatDeetzId;">
+          <td [class]="getBeatDeetzDataClass(beatDeetz)">{{getBeatDeetzDisplayText(beatDeetz)}}</td>
+        </ng-container>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>

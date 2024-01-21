@@ -9,6 +9,7 @@ import {Note} from "tonal";
 import {ExerciseBeat} from "../../models/api/exercise-beat";
 import {MidiMessageService} from "../../services/midi-message.service";
 import {RealTimeExerciseEngine} from "../../helpers/exercise-engine/real-time-exercise-engine";
+import {ExerciseDeetz} from "../../helpers/exercise-engine/exercise-deetz";
 
 @Component({
   selector: 'app-exercise',
@@ -50,6 +51,10 @@ export class ExerciseComponent implements OnInit, OnDestroy{
 
   public get currentBeat(): ExerciseBeat {
     return this.exercise.beats[this.beatIndex];
+  }
+
+  public get exerciseDeetz(): ExerciseDeetz {
+    return this.engine.exerciseDeetz;
   }
 
   public get currentKeyProgressWidth(): string {
@@ -124,6 +129,12 @@ export class ExerciseComponent implements OnInit, OnDestroy{
 
   public progressKey(): void {
     this.engine.onEvent('user selected next key');
+  }
+
+  public finish(): void {
+    while (!this.complete){
+      this.progressKey();
+    }
   }
 
   public again(): void {

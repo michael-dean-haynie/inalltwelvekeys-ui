@@ -37,7 +37,6 @@ export function notesSatisfyBeat(key: string, beat: ExerciseBeat, notes: number[
 
   let remainingNotes = [...notes];
   while(matchesFound < matchesRequired && !allChecked) {
-    console.log({matchesFound, allChecked, remainingNotes});
     const notesThatMatchBassNote = remainingNotes
       .map(Note.fromMidi)
       .map(Note.get)
@@ -48,7 +47,6 @@ export function notesSatisfyBeat(key: string, beat: ExerciseBeat, notes: number[
     }
 
     for (let i = 0; i < notesThatMatchBassNote.length; i++) {
-      console.log(i);
       const bassNoteMatch = notesThatMatchBassNote[i];
       // handle when voicing only has 1 note
       if (!nonBassMemberIntervals.length) {
