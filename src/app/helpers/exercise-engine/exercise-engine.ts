@@ -230,7 +230,7 @@ export abstract class ExerciseEngine {
       hadNoteMistakes: this.currentBeatHadMistakes,
       msSinceKeyPrompt,
       msSinceLastBeat,
-      velocity: 0
+      velocity: this.getAvgVelocityOfRightNotes()
     }
     this.currentKeyDeetz.beatDeetz.push(beatDeetz);
   }
@@ -239,6 +239,16 @@ export abstract class ExerciseEngine {
     if (this.exerciseDeetz.keyDeetz.find(kd => kd.key === this.currentKey)) {
       this.currentKeyDeetz.beatDeetz.pop();
     }
+  }
+
+  private getAvgVelocityOfRightNotes(): number {
+    const rightNotes = [...this.freshNotes]
+      .filter(note => ba.beatVoicingChromasIncludeNoteChroma(this.currentKey, this.currentBeat, note));
+
+    return rightNotes
+      .map(rn => this.messagesByNoteNumber.get(rn))
+      .map(msg => (msg?.data[2] || 0) / 127) // lazy undefined check. also note 127 is max velocity for midi
+      .reduce((ac, cv, ci, ar) => ac + cv, 0) / rightNotes.length;
   }
 
   private updateNoteSets(message: Message): void {

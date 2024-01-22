@@ -18,6 +18,7 @@ import { HistoryComponent } from './components/history/history.component'
 import {DpDatePickerModule} from 'ng2-date-picker';
 import {WaveformComponent} from "./components/waveform/waveform.component";
 import {ExerciseDeetzComponent} from "./components/exercise-deetz/exercise-deetz.component";
+import {TempDeetzComponent} from "./components/temp-deetz/temp-deetz.component";
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import {ExerciseDeetzComponent} from "./components/exercise-deetz/exercise-deetz
     ChordDetectorComponent,
     ToastComponent,
     HistoryComponent,
-    ExerciseDeetzComponent
+    ExerciseDeetzComponent,
+    TempDeetzComponent
   ],
   imports: [
     BrowserModule,

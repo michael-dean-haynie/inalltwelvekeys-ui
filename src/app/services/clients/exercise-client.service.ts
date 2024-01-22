@@ -67,6 +67,130 @@ export class ExerciseClientService {
         }
       ]
     });
+    this.exercises.push({
+
+      id: 'fd555553-ec4e-4db6-9bc0-47cab51b3fad',
+      name: 'Major Scales',
+      description: '',
+      beats: [
+        {
+          chordRomanNumeral: 'I',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VII',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VI',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'IV',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'III',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'II',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VII',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VI',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'IV',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'III',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'II',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'II',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'III',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'IV',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VI',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VII',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'II',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'III',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'IV',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'V',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VI',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'VII',
+          chordVoicing: ['1P']
+        },
+        {
+          chordRomanNumeral: 'I',
+          chordVoicing: ['1P']
+        }
+      ]
+    });
 
     this.exercises.push({
       id: 'fd7259d3-ec4e-4da6-9bc0-47cab51b3fad',

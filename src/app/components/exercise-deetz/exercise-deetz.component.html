@@ -1,20 +1,107 @@
-<table class="table">
-  <thead>
+<button type="button" class="btn btn-{{tab === 'notes' ? '' : 'outline-'}}secondary" (click)="tab = 'notes'">Notes</button>
+<button type="button" class="btn btn-{{tab === 'timing' ? '' : 'outline-'}}secondary" (click)="tab = 'timing'">Timing</button>
+<button type="button" class="btn btn-{{tab === 'velocity' ? '' : 'outline-'}}secondary" (click)="tab = 'velocity'">Velocity</button>
+
+<ng-container *ngIf="tab === 'notes'">
+  <table class="table">
+    <thead>
     <tr>
       <th scope="col">Key</th>
+      <th scope="col">% Correct</th>
       <ng-container *ngFor="let beat of exerciseDeetz.exercise.beats; index as beatIdx;">
         <th scope="col">{{getBeatHeaderText(beatIdx)}}</th>
       </ng-container>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <ng-container *ngFor="let keyDeetz of exerciseDeetz.keyDeetz; index as keyDeetzIdx;">
       <tr>
         <th scope="row">{{keyDeetz.key}}</th>
+        <td>{{getPercentCorrectForKey(keyDeetz)}}</td>
         <ng-container *ngFor="let beatDeetz of keyDeetz.beatDeetz; index as beatDeetzId;">
           <td [class]="getBeatDeetzDataClass(beatDeetz)">{{getBeatDeetzDisplayText(beatDeetz)}}</td>
         </ng-container>
       </tr>
     </ng-container>
-  </tbody>
-</table>
+    <tr>
+      <th scope="row">Averages</th>
+      <td>{{getPercentCorrectForAllKeys()}}</td>
+      <ng-container *ngFor="let beatDeetz of exerciseDeetz.keyDeetz[0].beatDeetz; index as beatDeetzId;">
+        <td></td>
+      </ng-container>
+    </tr>
+    </tbody>
+  </table>
+</ng-container>
+
+<ng-container *ngIf="tab === 'timing'">
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Key</th>
+      <th scope="col">Avg Tempo Variation (ms)</th>
+      <th scope="col">Duration (s)</th>
+      <th scope="col">Delay After Prompt (s)</th>
+      <ng-container *ngFor="let beat of exerciseDeetz.exercise.beats; index as beatIdx;">
+        <th scope="col">{{getBeatHeaderText(beatIdx)}}</th>
+      </ng-container>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let keyDeetz of exerciseDeetz.keyDeetz; index as keyDeetzIdx;">
+      <tr>
+        <th scope="row">{{keyDeetz.key}}</th>
+        <td>{{getAvgTempoVarForKey(keyDeetz)}}</td>
+        <td>{{getDurationForKey(keyDeetz)}}</td>
+        <td>{{getDelayAfterPromptForKey(keyDeetz)}}</td>
+        <ng-container *ngFor="let beatDeetz of keyDeetz.beatDeetz; index as beatDeetzId;">
+          <td>{{beatDeetz.msSinceLastBeat}}</td>
+        </ng-container>
+      </tr>
+    </ng-container>
+    <tr>
+      <th scope="row">Averages</th>
+      <td>{{getAvgTempoVarForAllKeys()}}</td>
+      <td>{{getAvgDurationForAllKeys()}}</td>
+      <td>{{getAvgDelayAfterPromptForAllKeys()}}</td>
+      <ng-container *ngFor="let beatDeetz of exerciseDeetz.keyDeetz[0].beatDeetz; index as beatDeetzId;">
+        <td></td>
+      </ng-container>
+    </tr>
+    </tbody>
+  </table>
+</ng-container>
+
+<ng-container *ngIf="tab === 'velocity'">
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Key</th>
+      <th scope="col">Avg Velocity Variation (%)</th>
+      <ng-container *ngFor="let beat of exerciseDeetz.exercise.beats; index as beatIdx;">
+        <th scope="col">{{getBeatHeaderText(beatIdx)}}</th>
+      </ng-container>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let keyDeetz of exerciseDeetz.keyDeetz; index as keyDeetzIdx;">
+      <tr>
+        <th scope="row">{{keyDeetz.key}}</th>
+        <td>{{getAvgVelocityVarForKey(keyDeetz)}}</td>
+        <ng-container *ngFor="let beatDeetz of keyDeetz.beatDeetz; index as beatDeetzId;">
+          <td style="background: linear-gradient(to top, rgba(108, 152, 85, .5) 0%, rgba(108, 152, 85, .5) {{getVelocityAsPercentage(beatDeetz.velocity)}}%, white {{getVelocityAsPercentage(beatDeetz.velocity)}}%, white 100%);">
+            {{getVelocityAsPercentage(beatDeetz.velocity)}}
+          </td>
+        </ng-container>
+      </tr>
+    </ng-container>
+    <tr>
+      <th scope="row">Averages</th>
+      <td>{{getAvgVelocityVarForAllKeys()}}</td>
+      <ng-container *ngFor="let beatDeetz of exerciseDeetz.keyDeetz[0].beatDeetz; index as beatDeetzId;">
+        <td></td>
+      </ng-container>
+    </tr>
+    </tbody>
+  </table>
+</ng-container>
